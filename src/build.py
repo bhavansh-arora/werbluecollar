@@ -207,6 +207,7 @@ def build():
         meta = json.loads(m.group(1))
         body = src[m.end():]
         body = re.sub(r"\{\{ic:([a-z-]+)(?::([a-z-_ ]+))?\}\}", lambda mm: ic(mm.group(1), mm.group(2) or ""), body)
+        body = re.sub(r"<img (?![^>]*decoding=)", '<img decoding="async" ', body)  # decode off the main thread
         body = body.replace("{{ticker}}", ticker()).replace("{{PHONE}}", PHONE).replace("{{TEL}}", TEL).replace("{{EMAIL}}", EMAIL).replace("{{ADDR}}", ADDR)
         cta = cta_band(meta.get("cta_title"), meta.get("cta_sub")) if meta.get("cta", True) else ""
         scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site"] + meta.get("scripts", []))

@@ -1215,3 +1215,41 @@ body::after {
 .phero .chip { background: rgba(255,255,255,.06); border-color: var(--line-l-2); color: var(--t-light); transition: background-color .3s, border-color .3s; }
 .phero .chip:hover { background: var(--volt); border-color: var(--volt); color: var(--ink); }
 @media (max-width: 899px) { .seg { display: grid; grid-template-columns: 1fr 1fr; border-radius: 18px; } .seg button { border-radius: 14px; height: 46px; } }
+
+/* ==========================================================================
+   PERFORMANCE PASS: smooth scrolling on real laptops and phones
+   ========================================================================== */
+/* Grain: static pre-rendered tile, no live noise filter, no animation */
+body::after { inset: 0; animation: none; opacity: .05; background-image: url("../img/grain.png"); background-size: 160px 160px; }
+
+/* Blur only on the header; everything else uses a solid tint (blur over scrolling content is expensive) */
+.hx__dock, .mbar, .glass, .tag, .svx__media figcaption, .hero .chip, .hx .chip, .menu { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.hx__dock { background: rgba(7,17,31,.9); }
+.mbar { background: rgba(7,17,31,.96); }
+.glass { background: rgba(11,22,38,.88); }
+.tag { background: rgba(7,17,31,.82); }
+.tag--volt { background: var(--volt); }
+.svx__media figcaption { background: rgba(7,17,31,.85); }
+.hdr.is-scrolled .hdr__bar, .hdr--solid .hdr__bar { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); background: rgba(7,17,31,.86); }
+
+/* Map pulse: SVG shape animation forced a full layout every frame, so it is static now */
+.area__map .ring { animation: none; opacity: .45; transform: scale(1.8); }
+
+/* Quicker, lighter reveals: content is never left waiting */
+.rv { transform: translateY(18px); transition: opacity .6s var(--ease-out), transform .7s var(--ease-out); }
+.rv-clip { transition: clip-path .9s var(--ease-out); }
+.split-line .line > span { transition: transform .8s var(--ease-out); transition-delay: calc(var(--i, 0) * 0.06s + var(--d, 0s)); }
+.split-line.is-in .pill-img { animation: pillIn .8s var(--ease-out) both; animation-delay: .35s; }
+@keyframes pillIn { from { clip-path: inset(0 50% 0 50% round 999px); opacity: 0; } to { clip-path: inset(0 0 0 0 round 999px); opacity: 1; } }
+
+/* Hero photo: shorter zoom on its own compositor layer */
+.hx__media img, .hero__media img { will-change: transform; animation-duration: 10s; }
+/* Live dot: pulse with transform/opacity on a pseudo-element (box-shadow repainted every frame) */
+.dot--live { position: relative; animation: none; box-shadow: none; }
+.dot--live::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #3ee07f; animation: livePulse 2s var(--ease-out) infinite; will-change: transform, opacity; }
+@keyframes livePulse { from { transform: scale(1); opacity: .6; } to { transform: scale(3.2); opacity: 0; } }
+/* Ticker & spinning badge on their own GPU layers */
+.ticker__track, .badge-spin svg { will-change: transform; }
+/* 'clip' instead of 'hidden': same look, but it does not create a scroll container (iOS scroll catching, broken sticky) */
+html, body { overflow-x: clip; }
+@media (prefers-reduced-motion: reduce) { .dot--live::after { animation: none; opacity: 0; } }

@@ -41,7 +41,7 @@
   /* ---------- Reveal on view ---------- */
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
-  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  }, { rootMargin: '0px 0px 12% 0px', threshold: 0 }); // reveal just before it scrolls in, so nothing looks empty
   $$('.rv, .rv-clip, .split-line, .phero__media, .tl__item, [data-count]').forEach(el => io.observe(el));
 
   /* ---------- Counters ---------- */
@@ -80,14 +80,23 @@
       node.replaceWith(frag);
     });
     const spans = $$('.w', el);
+    // One read + only the changed words per frame, and only while the paragraph is near the screen
+    let shown = -1, queued = false, near = false;
     const update = () => {
+      queued = false;
       const r = el.getBoundingClientRect(), vh = innerHeight;
       const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
       const n = Math.round(p * spans.length);
-      spans.forEach((s, i) => s.classList.toggle('on', i < n));
+      if (n === shown) return;
+      const lo = Math.min(n, Math.max(shown, 0)), hi = Math.max(n, shown);
+      for (let i = lo; i < hi; i++) spans[i].classList.toggle('on', i < n);
+      shown = n;
     };
+    const onS = () => { if (!reduce && near && !queued) { queued = true; requestAnimationFrame(update); } };
+    new IntersectionObserver(([e]) => { near = e.isIntersecting; if (near) onS(); }, { rootMargin: '30% 0px' }).observe(el);
     if (reduce) { spans.forEach(s => s.classList.add('on')); return; }
-    addEventListener('scroll', update, { passive: true }); update();
+    addEventListener('scroll', onS, { passive: true });
+    spans.forEach(s => s.classList.remove('on')); shown = 0; update();
   });
 
   /* ---------- Services list: hover swaps the photo ---------- */
@@ -134,7 +143,8 @@
       const p = Math.min(1, Math.max(0, (innerHeight * 0.55 - r.top) / r.height));
       fill.style.height = (p * 100) + '%';
     };
-    addEventListener('scroll', upd, { passive: true }); upd();
+    let q = false;
+    addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(() => { q = false; upd(); }); } }, { passive: true }); upd();
   }
 
   /* ---------- Live sun widget (Grover Beach, CA) ---------- */
