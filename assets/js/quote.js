@@ -85,7 +85,7 @@
     back.style.visibility = state.step === 0 ? 'hidden' : 'visible';
     nextT.textContent = state.step === steps.length - 1 ? 'Send my request' : 'Continue';
     const top = form.getBoundingClientRect().top + scrollY - 110;
-    if (scrollY > top + 40) scrollTo({ top, behavior: 'smooth' });
+    if (scrollY > top + 40) { window.BCE_LENIS ? window.BCE_LENIS.scrollTo(top) : scrollTo({ top, behavior: 'smooth' }); }
   }
 
   function sync() {
@@ -122,7 +122,7 @@
     form.hidden = true; $('[data-done]').hidden = false;
     state.done = true; save();
     try { localStorage.removeItem(KEY); } catch (e) {}
-    $('[data-done]').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.BCE_LENIS ? window.BCE_LENIS.scrollTo($('[data-done]'), { offset: -110 }) : $('[data-done]').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
   sync(); go(state.step);

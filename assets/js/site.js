@@ -6,6 +6,27 @@
   const $ = (s, c = d) => c.querySelector(s);
   const $$ = (s, c = d) => [...c.querySelectorAll(s)];
 
+  /* ---------- Smooth scrolling (mouse & trackpad only; touch keeps native momentum) ---------- */
+  let lenis = null;
+  if (!reduce && window.Lenis && matchMedia('(pointer: fine)').matches) {
+    lenis = new window.Lenis({ lerp: 0.12, wheelMultiplier: 1, smoothWheel: true });
+    const tick = (t) => { lenis.raf(t); requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    // In-page anchors glide to their target, clearing the fixed header
+    d.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a || a.getAttribute('href').length < 2) return;
+      const target = d.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      lenis.scrollTo(target, { offset: -96 });
+      history.pushState(null, '', a.getAttribute('href'));
+    });
+    // Arriving with a #hash from another page
+    if (location.hash && d.querySelector(location.hash)) setTimeout(() => lenis.scrollTo(location.hash, { offset: -96, immediate: true }), 60);
+  }
+  window.BCE_LENIS = lenis;
+
   /* ---------- Header: solid on scroll, hide on scroll down ---------- */
   const hdr = $('[data-hdr]'), mbar = $('.mbar'), concept = $('.concept');
   let lastY = scrollY, ticking = false;
@@ -29,6 +50,7 @@
     d.body.classList.toggle('menu-open', open);
     menuBtn && menuBtn.setAttribute('aria-expanded', String(open));
     const m = $('#menu'); if (m) m.toggleAttribute('inert', !open);
+    if (lenis) open ? lenis.stop() : lenis.start();
   };
   menuBtn && menuBtn.addEventListener('click', () => setMenu(!d.body.classList.contains('menu-open')));
   $$('#menu a').forEach(a => a.addEventListener('click', () => setMenu(false)));

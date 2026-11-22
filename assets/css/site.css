@@ -1253,3 +1253,97 @@ body::after { inset: 0; animation: none; opacity: .05; background-image: url("..
 /* 'clip' instead of 'hidden': same look, but it does not create a scroll container (iOS scroll catching, broken sticky) */
 html, body { overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) { .dot--live::after { animation: none; opacity: 0; } }
+
+/* ==========================================================================
+   EDITORIAL PASS: less template, tighter rhythm, smoother motion
+   ========================================================================== */
+
+/* Tighter rhythm: no dead air between sections */
+:root { --sec: clamp(64px, 7.2vw, 116px); --sec-sm: clamp(44px, 5vw, 76px); --gap-lg: clamp(24px, 3.2vw, 52px); }
+.cta { margin-top: clamp(8px, 1.2vw, 16px); }
+.cta__inner { padding-block: clamp(52px, 7vw, 104px); }
+.mt-l { margin-top: clamp(28px, 3.4vw, 48px); }
+
+/* Smooth scrolling (Lenis) */
+html.lenis, html.lenis body { height: auto; }
+html.lenis { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: clip; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* Smooth page-to-page transitions (Chrome, Edge, Safari 18.2+; others just navigate) */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: vtOut .28s var(--ease-out) both; }
+::view-transition-new(root) { animation: vtIn .45s var(--ease-out) both; }
+@keyframes vtOut { to { opacity: 0; transform: translateY(-10px); } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }
+
+/* Section labels: quiet editorial index, not pills */
+.eyebrow { gap: 12px; font-size: 12px; letter-spacing: .14em; color: var(--t-dark-2); }
+.eyebrow::after { display: none; }
+.eyebrow b, .sec--ink .eyebrow b, .sec--ink2 .eyebrow b, .on-dark .eyebrow b, .phero .eyebrow b, .cta .eyebrow b, .sec--volt .eyebrow b {
+  background: none; border: 0; padding: 0; border-radius: 0; color: var(--volt-deep);
+}
+.sec--ink .eyebrow b, .sec--ink2 .eyebrow b, .on-dark .eyebrow b, .phero .eyebrow b { color: var(--volt); }
+.cta .eyebrow b, .sec--volt .eyebrow b { color: var(--ink); }
+.sec--ink .eyebrow, .sec--ink2 .eyebrow { color: var(--t-light-2); }
+
+/* Section heads: a running header (rule, index left, note right) with the headline beneath at full width */
+.shead, .svx__head { border-top: 1px solid var(--line-d-2); padding-top: 18px; gap: 18px 40px; margin-bottom: clamp(32px, 4vw, 56px); }
+.sec--ink .shead, .sec--ink2 .shead { border-top-color: var(--line-l-2); }
+.shead .mt-m, .shead h2 { margin-top: 0; }
+.shead p, .shead--split p { font-size: 15.5px; line-height: 1.55; }
+@media (min-width: 900px) {
+  .shead--split { grid-template-columns: 1fr minmax(0, 40ch); align-items: start; }
+  .shead--split > div { display: contents; }
+  .shead--split .eyebrow { grid-column: 1; grid-row: 1; align-self: start; padding-top: 2px; }
+  .shead--split > p { grid-column: 2; grid-row: 1; justify-self: end; }
+  .shead--split h2 { grid-column: 1 / -1; grid-row: 2; max-width: 22ch; }
+}
+.svx__head { gap: 18px; }
+
+/* Open columns instead of boxed card grids */
+.pillar, .card:not(.card--ink), .card--ink {
+  background: transparent; border: 0; border-radius: 0; box-shadow: none !important; transform: none !important;
+  padding: 22px 0 0; border-top: 1.5px solid var(--ink);
+}
+.card--ink { border-top-color: var(--line-l-2); }
+.pillar:hover, .card:not(.card--ink):hover { border-top-color: var(--volt-deep); }
+.card--ink:hover { border-top-color: var(--volt); }
+.pillar__ic { display: none; }
+.pillars, .cards { gap: clamp(28px, 3vw, 48px) clamp(24px, 3vw, 44px); }
+.pillars { margin-top: clamp(32px, 4vw, 56px); }
+.pillar h3, .card h3 { font-size: clamp(20px, 1.6vw, 23px); }
+
+/* Inner page headers: compact, headline flows across the width, photo as a wide band */
+.phero { padding-top: calc(var(--hdr-h) + clamp(28px, 4vw, 56px)); padding-bottom: calc(clamp(36px, 4.5vw, 64px) + 14px); }
+.phero__crumb { margin-bottom: clamp(20px, 2.6vw, 32px); }
+.phero__title .pill-img { width: 1.6em; }
+.phero__media { margin-top: clamp(28px, 3.6vw, 52px); aspect-ratio: 2.7 / 1; }
+@media (max-width: 700px) { .phero__media { aspect-ratio: 16 / 10; } }
+@media (min-width: 1000px) {
+  .phero__grid { grid-template-columns: 1fr; gap: clamp(24px, 2.6vw, 36px); }
+  .phero__title { max-width: 22ch; }
+  .phero__title .line { display: inline-block; margin-right: .26em; }
+  .phero__side { justify-self: stretch; max-width: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px 56px; flex-wrap: wrap; }
+  .phero__side > p { max-width: 54ch; }
+}
+
+/* Manifesto uses the full measure */
+.mani { max-width: 31ch; font-size: clamp(28px, 3.5vw, 56px); }
+
+/* Battery planner: both columns share the same height (no hole under the tiles) */
+.bat { align-items: stretch; }
+.bat > .rv:first-child { display: flex; }
+.bat__loads { flex: 1; grid-auto-rows: 1fr; }
+/* Running header: note sits beside the headline (bottom-aligned), so the label row never leaves a gap */
+@media (min-width: 900px) {
+  .shead--split { grid-template-columns: 1fr minmax(0, 38ch); row-gap: 16px; }
+  .shead--split .eyebrow { grid-column: 1 / -1; grid-row: 1; }
+  .shead--split h2 { grid-column: 1; grid-row: 2; max-width: none; }
+  .shead--split > p { grid-column: 2; grid-row: 2; align-self: end; justify-self: end; padding-bottom: .4em; }
+}
+/* Battery planner: keep tiles at natural height (stretching made them hollow) */
+.bat { align-items: start; }
+.bat > .rv:first-child { display: block; }
+.bat__loads { grid-auto-rows: auto; }
