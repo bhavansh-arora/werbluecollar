@@ -64,11 +64,11 @@
       setTimeout(() => {
         root.classList.add('pt-leave');
         uncover();
-        setTimeout(() => root.classList.remove('pt-leave'), 1200);
-      }, Math.max(0, 240 - (performance.now() - t0)));
+        setTimeout(() => root.classList.remove('pt-leave'), 1700);
+      }, Math.max(0, 420 - (performance.now() - t0)));   // hold on the page name for a beat
     };
     Promise.race([d.fonts ? d.fonts.ready : Promise.resolve(), new Promise(r => setTimeout(r, 700))]).then(lift);
-    setTimeout(lift, 1800);
+    setTimeout(lift, 2000);
   }
 
   // Leaving: the curtain sweeps up with the next page's name, then we navigate.
@@ -81,7 +81,7 @@
     e.preventDefault();
     if (ptName) ptName.textContent = nameFor(url);
     root.classList.add('pt-out');
-    setTimeout(() => { location.href = url.href; }, 560);
+    setTimeout(() => { location.href = url.href; }, 1000);
   });
   const fetched = new Set();
   const prefetch = (e) => {
