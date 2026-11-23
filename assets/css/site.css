@@ -882,8 +882,9 @@ html.is-loading { overflow: hidden; }
 .pt__to { display: grid; justify-items: center; gap: 6px; }
 .pt__to b { font-size: clamp(26px, 3vw, 38px); font-weight: 750; letter-spacing: -0.045em; line-height: 1; }
 html.pt-out .pt { visibility: visible; pointer-events: auto; transform: none; transition: transform .5s var(--swoop); }
-html.pt-out .pt__in { opacity: 1; transform: none; transition: opacity .25s .2s, transform .45s var(--out) .2s; }
-html.pt-out .pt__batt i { background: var(--gold); transition: background-color .12s calc(.26s + var(--d, 0s) * .7); }
+/* everything on the curtain finishes before the next page takes over (at 560ms), so it continues the exact same picture */
+html.pt-out .pt__in { opacity: 1; transform: none; transition: opacity .22s .16s, transform .34s var(--out) .14s; }
+html.pt-out .pt__batt i { background: var(--gold); transition: background-color .1s calc(.2s + var(--d, 0s) * .6); }
 html.pt-out main, html.pt-out .ftr { transform: scale(.97) translateY(-2vh); opacity: .5; transition: transform .7s var(--swoop), opacity .7s; }
 html.pt-in .pt { visibility: visible; transform: none; }
 html.pt-in .pt::before { display: none; }
@@ -1313,6 +1314,7 @@ html.is-loading .hero__bg.plx, html.pt-in .hero__bg.plx { scale: 1.2; }
 /* Cursor ring (mouse only): grows over anything you can click, says "View" over photos */
 .cur { position: fixed; left: 0; top: 0; z-index: 3100; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; border: 1.5px solid var(--gold); pointer-events: none; opacity: 0; display: grid; place-items: center; transition: opacity .3s, scale .35s var(--out), background-color .3s, border-color .3s; will-change: transform; }
 .cur.on { opacity: .95; }
+html.pt-out .cur { opacity: 0; }   /* the ring fades with the old page instead of vanishing on the next one */
 .cur.is-link { scale: 1.65; background: rgba(240, 171, 60, .16); }
 .cur.is-img { scale: 2.3; background: var(--gold); border-color: var(--gold); }
 .cur span { font-family: var(--f-mono); font-size: 6px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); opacity: 0; transition: opacity .2s; }

@@ -58,7 +58,6 @@
   // Arriving from another page (or a reload): the curtain is down, lift it as soon as the page is usable.
   const pt = $('[data-pt]'), ptName = $('[data-pt-name]');
   if (root.classList.contains('pt-in')) {
-    if (ptName) ptName.textContent = nameFor(location);
     const t0 = performance.now();
     const lift = () => {
       if (!root.classList.contains('pt-in')) return;

@@ -5,6 +5,7 @@ Each page starts with a JSON meta comment:
 <!--META {"title": "...", "desc": "...", "nav": "payment", "scripts": ["calc"], "cta": true} -->
 Run:  python3 src/build.py
 """
+import base64
 import json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -105,9 +106,15 @@ def btn(label, href, cls="", icon="arrow-r", attrs=""):
     """Pill button with a round arrow chip, as on the reference."""
     return f'<a class="btn {cls}" href="{href}"{attrs}><span>{label}</span><i class="btn__ic">{ic(icon)}</i></a>'
 
-def covers():
+# Curtain label for each page: baked in so the arriving page's first frame already reads right
+PAGE_NAMES = {"index": "Home", "payment-options": "Ways to pay", "services": "Services", "process": "How it works",
+              "about": "About the crew", "quote": "Your free quote", "preview-pack": "Preview pack"}
+
+def covers(page=""):
     """First-visit loader (a battery charging with real page progress) and the page-change curtain."""
     cells = "<i></i>" * 10
+    # the curtain's logo is inlined (6 KB) so it is on screen in the very first frame of the next page
+    mark = "data:image/webp;base64," + base64.b64encode((ROOT / "assets/img/logo-mark-96.webp").read_bytes()).decode()
     return f"""
 <div class="loader" data-loader aria-hidden="true">
   <div class="loader__glow"></div>
@@ -119,9 +126,9 @@ def covers():
 </div>
 <div class="pt" data-pt aria-hidden="true">
   <div class="pt__in">
-    <img class="pt__mark" src="assets/img/logo-mark.png" alt="" width="48" height="48">
+    <img class="pt__mark" src="{mark}" alt="" width="48" height="48" decoding="sync">
     <div class="pt__batt"><i></i><i></i><i></i><i></i><i></i></div>
-    <p class="pt__to"><span class="kicker">Heading to</span><b data-pt-name>Blue Collar</b></p>
+    <p class="pt__to"><span class="kicker">Heading to</span><b data-pt-name>{PAGE_NAMES.get(page, "Blue Collar")}</b></p>
   </div>
 </div>"""
 
@@ -379,7 +386,7 @@ def build():
         body = body.replace("{{bill}}", BILL.replace("{id}", p.stem)).replace("{{PHONE}}", PHONE).replace("{{TEL}}", TEL).replace("{{EMAIL}}", EMAIL).replace("{{ADDR}}", ADDR)
         cta = cta_band(meta.get("cta_title"), meta.get("cta_sub")) if meta.get("cta", True) else ""
         scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site", "motion"] + meta.get("scripts", []))
-        html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + covers() + header(meta.get("nav", "")) +
+        html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + covers(p.stem) + header(meta.get("nav", "")) +
                 f'\n<main id="main">\n{body}\n{cta}\n</main>' + footer() +
                 (concept_badge() if meta.get("badge", True) else "") + f"\n{scripts}\n</body>\n</html>\n")
         (ROOT / p.name).write_text(html)
