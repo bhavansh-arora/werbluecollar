@@ -56,7 +56,15 @@
     if (menu) menu.toggleAttribute('inert', !open);
   };
   if (menuBtn) menuBtn.addEventListener('click', () => setMenu(!d.body.classList.contains('menu-open')));
-  $$('#menu a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  // Going to another page: keep the menu up and let the page curtain sweep over it. Closing it first
+  // flashed the old page for a moment before the curtain arrived.
+  $$('#menu a').forEach(a => a.addEventListener('click', () => {
+    let other = false;
+    try { other = new URL(a.getAttribute('href'), location.href).pathname !== location.pathname; } catch (e) {}
+    if (other && !matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    setMenu(false);
+  }));
+  addEventListener('pageshow', (e) => { if (e.persisted) setMenu(false); });
   addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
   addEventListener('resize', () => { if (innerWidth >= 1100) setMenu(false); });
 
