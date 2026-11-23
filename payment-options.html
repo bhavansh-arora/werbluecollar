@@ -60,30 +60,30 @@
   </div>
 </div>
 <main id="main">
-<section class="phero phero--media" aria-labelledby="ph-h">
-  <div class="wrap phero__grid">
-    <div class="phero__text">
-      <nav class="phero__crumb" aria-label="Breadcrumb"><a href="index.html">Home</a> / <span>Ways to pay</span></nav>
-      <h1 class="d-xl" id="ph-h">Buy it. Finance it. Or just pay for the power.</h1>
-      <p>Most installers lead with the one option that pays them best. We price all three on paper, side by side, with the assumptions written down. Then you pick.</p>
-      <div class="btns">
-        <a class="btn btn--volt" href="#calc">Run my numbers<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
-        <a class="btn btn--ghost" href="#match">Which fits me?</a>
-      </div>
+<section class="hero hero--page" aria-labelledby="ph-h">
+  <img decoding="async" class="hero__bg" src="assets/img/consult.webp" srcset="assets/img/consult-sm.webp 900w, assets/img/consult.webp 1800w" sizes="100vw" alt="" fetchpriority="high" style="object-position:50% 45%">
+  <div class="badge" aria-hidden="true">
+    <svg viewBox="0 0 200 200"><defs><path id="badge-p" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs><text><textPath href="#badge-p" textLength="458">FREE SITE CHECK · NO PRESSURE · GROVER BEACH ·</textPath></text></svg>
+    <img decoding="async" src="assets/img/logo-mark.png" alt="">
+  </div>
+  <div class="wrap hero__in">
+    <nav class="crumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i></i><span>Ways to pay</span></nav>
+    <h1 class="d-hero d-hero--page" id="ph-h">Buy it. Finance it. <em>Or just pay for the power.</em></h1>
+    <div class="hero__row">
+      <p class="hero__lede">Most installers lead with the one option that pays them best. We price all three on paper, side by side, with the assumptions written down. Then you pick.</p>
+      <div class="btns"><a class="btn btn--gold" href="#calc"><span>Run my numbers</span><i class="btn__ic"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></i></a><a class="btn btn--outline-light" href="#match"><span>Which fits me?</span></a></div>
     </div>
-    <figure class="phero__media" data-tilt="4"><img decoding="async" src="assets/img/consult-sm.webp" srcset="assets/img/consult-sm.webp 900w, assets/img/consult.webp 1800w" sizes="(min-width:1000px) 50vw, 100vw" alt="A homeowner couple reviewing a solar layout and pricing on paper" fetchpriority="high"></figure>
   </div>
 </section>
+<div class="wrap"><ul class="facts"><li><p class="kicker">Purchase</p><b>Biggest lifetime savings</b></li><li><p class="kicker">Finance</p><b>$0 down, you own it</b></li><li><p class="kicker">PPA</p><b>$0 upfront, no loan</b></li><li><p class="kicker">All three</p><b>Priced side by side</b></li></ul></div>
 
 <!-- At-a-glance -->
 <section class="sec" aria-labelledby="glance-h">
   <div class="wrap">
-    <div class="shead shead--split">
-      <div>
-        <p class="eyebrow">At a glance</p>
-        <h2 class="d-l" id="glance-h">Three paths. Same crew, same install.</h2>
-      </div>
-      <p class="muted">Whichever you pick, the design, the permits and the install are handled by the same team. The only thing that changes is how the money works.</p>
+    <div class="head">
+      <p class="label">At a glance</p>
+      <h2 class="d-l" id="glance-h">Three paths. <em>Same crew, same install.</em></h2>
+      <p class="head__note">Whichever you pick, the design, the permits and the install are handled by the same team. The only thing that changes is how the money works.</p>
     </div>
     <div class="cards cards--3">
       <article class="card card--opt opt-buy">
@@ -111,12 +111,10 @@
 <!-- Calculator -->
 <section class="sec sec--ink" id="calc" aria-labelledby="calc-h">
   <div class="wrap">
-    <div class="shead shead--split">
-      <div>
-        <p class="eyebrow">Live comparison</p>
-        <h2 class="d-l" id="calc-h">Your bill in. 25 years out.</h2>
-      </div>
-      <p class="muted">Slide to your average monthly electric bill. The three options update instantly, and the chart shows how much each one leaves in your pocket over 25 years.</p>
+    <div class="head">
+      <p class="label">Live comparison</p>
+      <h2 class="d-l" id="calc-h">Your bill in. <em>25 years out.</em></h2>
+      <p class="head__note">Slide to your average monthly electric bill. The three options update instantly, and the chart shows how much each one leaves in your pocket over 25 years.</p>
     </div>
     <div class="cmp" data-cmp>
       <div class="cmp__ctrl">
@@ -189,15 +187,38 @@
   </div>
 </section>
 
+<!-- What waiting costs -->
+<section class="sec" aria-labelledby="wait-h">
+  <div class="wrap">
+    <div class="head">
+      <p class="label">Waiting has a price</p>
+      <h2 class="d-l" id="wait-h">What 25 years of <em>bills add up to.</em></h2>
+      <p class="head__note">The same $220-a-month home. One line keeps paying the utility as rates rise; the other buys the system once and pays only what solar doesn't cover.</p>
+    </div>
+    <div class="wait">
+      <svg viewBox="0 0 1000 400" role="img" aria-label="Cumulative spend over 25 years: about $102,828 paying the utility versus about $38,402 with a purchased solar system">
+        <g class="wait__grid"><line x1="70" x2="810" y1="360.0" y2="360.0"/><text x="58" y="364.0" text-anchor="end">$0k</text><line x1="70" x2="810" y1="297.0" y2="297.0"/><text x="58" y="301.0" text-anchor="end">$20k</text><line x1="70" x2="810" y1="234.0" y2="234.0"/><text x="58" y="238.0" text-anchor="end">$40k</text><line x1="70" x2="810" y1="171.1" y2="171.1"/><text x="58" y="175.1" text-anchor="end">$60k</text><line x1="70" x2="810" y1="108.1" y2="108.1"/><text x="58" y="112.1" text-anchor="end">$80k</text><line x1="70" x2="810" y1="45.1" y2="45.1"/><text x="58" y="49.1" text-anchor="end">$100k</text><text x="70.0" y="388" text-anchor="middle">Today</text><text x="218.0" y="388" text-anchor="middle">Yr 5</text><text x="366.0" y="388" text-anchor="middle">Yr 10</text><text x="514.0" y="388" text-anchor="middle">Yr 15</text><text x="662.0" y="388" text-anchor="middle">Yr 20</text><text x="810.0" y="388" text-anchor="middle">Yr 25</text></g>
+        <path class="wait__gap" d="M70.0 360.0 L99.6 351.7 L129.2 343.1 L158.8 334.2 L188.4 325.0 L218.0 315.4 L247.6 305.5 L277.2 295.3 L306.8 284.7 L336.4 273.8 L366.0 262.5 L395.6 250.7 L425.2 238.6 L454.8 226.0 L484.4 213.0 L514.0 199.6 L543.6 185.7 L573.2 171.2 L602.8 156.3 L632.4 140.9 L662.0 124.9 L691.6 108.4 L721.2 91.2 L750.8 73.5 L780.4 55.2 L810.0 36.2 L810.0 239.1 L780.4 244.6 L750.8 249.9 L721.2 254.9 L691.6 259.7 L662.0 264.2 L632.4 268.6 L602.8 272.8 L573.2 276.7 L543.6 280.5 L514.0 284.1 L484.4 287.5 L454.8 290.8 L425.2 293.9 L395.6 296.8 L366.0 299.6 L336.4 302.3 L306.8 304.8 L277.2 307.2 L247.6 309.5 L218.0 311.7 L188.4 313.7 L158.8 315.7 L129.2 317.5 L99.6 319.3 L70.0 321.0 Z"/>
+        <path class="wait__line wait__line--u" d="M70.0 360.0 L99.6 351.7 L129.2 343.1 L158.8 334.2 L188.4 325.0 L218.0 315.4 L247.6 305.5 L277.2 295.3 L306.8 284.7 L336.4 273.8 L366.0 262.5 L395.6 250.7 L425.2 238.6 L454.8 226.0 L484.4 213.0 L514.0 199.6 L543.6 185.7 L573.2 171.2 L602.8 156.3 L632.4 140.9 L662.0 124.9 L691.6 108.4 L721.2 91.2 L750.8 73.5 L780.4 55.2 L810.0 36.2" pathLength="1"/>
+        <path class="wait__line wait__line--s" d="M70.0 321.0 L99.6 319.3 L129.2 317.5 L158.8 315.7 L188.4 313.7 L218.0 311.7 L247.6 309.5 L277.2 307.2 L306.8 304.8 L336.4 302.3 L366.0 299.6 L395.6 296.8 L425.2 293.9 L454.8 290.8 L484.4 287.5 L514.0 284.1 L543.6 280.5 L573.2 276.7 L602.8 272.8 L632.4 268.6 L662.0 264.2 L691.6 259.7 L721.2 254.9 L750.8 249.9 L780.4 244.6 L810.0 239.1" pathLength="1"/>
+        <circle class="wait__dot wait__dot--u" cx="810.0" cy="36.2" r="6"/>
+        <circle class="wait__dot wait__dot--s" cx="810.0" cy="239.1" r="6"/>
+        <g class="wait__lab"><text x="826.0" y="41.2">Utility only</text><text class="v" x="826.0" y="61.2">$102,828</text>
+        <text x="826.0" y="223.1">With solar</text><text class="v" x="826.0" y="243.1">$38,402</text></g>
+        <g class="wait__keep"><path d="M796.0 46.2 V 229.1"/><text x="784.0" y="142.6" text-anchor="end">You keep $64,425</text></g>
+      </svg>
+      <ul class="wait__legend"><li><i class="lg wait__lg--u"></i>Keep paying the utility (rates +3.5% a year)</li><li><i class="lg wait__lg--s"></i>Buy the system once, pay only what solar doesn't cover</li></ul>
+    </div>
+  </div>
+</section>
+
 <!-- Matcher -->
 <section class="sec" id="match" aria-labelledby="match-h">
   <div class="wrap">
-    <div class="shead shead--split">
-      <div>
-        <p class="eyebrow">Which one fits me?</p>
-        <h2 class="d-l" id="match-h">Four taps. A straight answer.</h2>
-      </div>
-      <p class="muted">No email required to see your result. Answer honestly and we'll tell you which path fits, and why.</p>
+    <div class="head">
+      <p class="label">Which one fits me?</p>
+      <h2 class="d-l" id="match-h">Four taps. <em>A straight answer.</em></h2>
+      <p class="head__note">No email required to see your result. Answer honestly and we'll tell you which path fits, and why.</p>
     </div>
     <div class="match" data-match>
       <div class="match__card">
@@ -255,11 +276,9 @@
 <!-- Side-by-side table -->
 <section class="sec sec--paper2" aria-labelledby="tbl-h">
   <div class="wrap">
-    <div class="shead shead--split">
-      <div>
-        <p class="eyebrow">The fine print, in plain English</p>
-        <h2 class="d-l" id="tbl-h">Side by side. No asterisks.</h2>
-      </div>
+    <div class="head">
+      <p class="label">The fine print, in plain English</p>
+      <h2 class="d-l" id="tbl-h">Side by side. <em>No asterisks.</em></h2>
     </div>
     <div class="vt-wrap">
       <table class="vt">
@@ -283,8 +302,8 @@
 <section class="sec" aria-labelledby="faq-h">
   <div class="wrap split split--top split--faq">
     <div class="split__body sticky-lg">
-      <p class="eyebrow">Questions</p>
-      <h2 class="d-l" id="faq-h">Straight answers.</h2>
+      <p class="label">Questions</p>
+      <h2 class="d-l" id="faq-h">Straight <em>answers.</em></h2>
       <p class="muted">Still deciding? Call <a class="link-u" href="tel:+18054410939">(805) 441-0939</a> and talk to the people who'll actually do the work.</p>
       <a class="btn btn--volt" href="quote.html">Get all three priced<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
     </div>
@@ -300,6 +319,7 @@
 </section>
 
 
+<div class="marquee marquee--big" aria-hidden="true"><div class="marquee__track"><span>Solar</span><em>Battery backup</em><span>Three prices</span><em>Same crew</em><span>Ground mounts</span><em>Power that shows up</em><span>Solar</span><em>Battery backup</em><span>Three prices</span><em>Same crew</em><span>Ground mounts</span><em>Power that shows up</em></div></div>
 <section class="cta" aria-labelledby="cta-h">
   <img class="cta__bg" src="assets/img/hero-coast-sm.webp" srcset="assets/img/hero-coast-sm.webp 900w, assets/img/hero-coast.webp 1800w" sizes="100vw" alt="" loading="lazy">
   <div class="cta__in">

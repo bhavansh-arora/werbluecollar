@@ -39,6 +39,10 @@ A static multi-page site. No framework and no build tooling are needed to host i
     are magnetic, and the footer wordmark letters rise and lift near the cursor.
   - Rule: content that is already on screen is never hidden; entrances only apply below the fold or
     behind a cover. Reduced-motion users get none of it.
+- Inner pages: each starts with `<!--HERO {json}-->` (photo, title, lede, buttons, facts), rendered by
+  `photo_hero()` in `src/build.py`. Services has the clickable house explorer (`[data-explore]`), How it works
+  the sticky journey (`[data-journey]`), both in `site.js`. The waiting-cost chart on Ways to pay is drawn
+  at build time by `wait_chart()` from the same model as the calculator.
 - "A day on a Blue Collar home" (`assets/js/day.js`): an SVG house from 5:30 AM to midnight, simulated in
   5-minute steps for the same 4.0 kW system plus a 13.5 kWh battery, with play, scrub and an outage switch.
 - The payback chart and milestones on the homepage are computed at build time by `payback()` in

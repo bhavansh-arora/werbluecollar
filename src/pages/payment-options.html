@@ -1,29 +1,14 @@
 <!--META {"title": "Buy, Finance or PPA? Compare Solar Payment Options | Blue Collar Energy", "desc": "Compare buying, financing and a Power Purchase Agreement side by side with a live 25-year savings model for Central Coast homes. Find the option that fits in four taps.", "nav": "payment", "scripts": ["calc"], "cta_title": "Get all three <span class=\"serif\">priced for your roof.</span>", "cta_sub": "The calculator gets you close. A free site check gets you exact: your roof, your shade, a year of your bills, and purchase, finance and PPA numbers side by side on paper."} -->
 
-<section class="phero phero--media" aria-labelledby="ph-h">
-  <div class="wrap phero__grid">
-    <div class="phero__text">
-      <nav class="phero__crumb" aria-label="Breadcrumb"><a href="index.html">Home</a> / <span>Ways to pay</span></nav>
-      <h1 class="d-xl" id="ph-h">Buy it. Finance it. Or just pay for the power.</h1>
-      <p>Most installers lead with the one option that pays them best. We price all three on paper, side by side, with the assumptions written down. Then you pick.</p>
-      <div class="btns">
-        <a class="btn btn--volt" href="#calc">Run my numbers{{ic:arrow-r}}</a>
-        <a class="btn btn--ghost" href="#match">Which fits me?</a>
-      </div>
-    </div>
-    <figure class="phero__media" data-tilt="4"><img src="assets/img/consult-sm.webp" srcset="assets/img/consult-sm.webp 900w, assets/img/consult.webp 1800w" sizes="(min-width:1000px) 50vw, 100vw" alt="A homeowner couple reviewing a solar layout and pricing on paper" fetchpriority="high"></figure>
-  </div>
-</section>
+<!--HERO {"img": "consult", "pos": "50% 45%", "crumb": "Ways to pay", "title": "Buy it. Finance it. <em>Or just pay for the power.</em>", "lede": "Most installers lead with the one option that pays them best. We price all three on paper, side by side, with the assumptions written down. Then you pick.", "btns": [["Run my numbers", "#calc", "btn--gold"], ["Which fits me?", "#match", "ghost"]], "facts": [["Purchase", "Biggest lifetime savings"], ["Finance", "$0 down, you own it"], ["PPA", "$0 upfront, no loan"], ["All three", "Priced side by side"]]} -->
 
 <!-- At-a-glance -->
 <section class="sec" aria-labelledby="glance-h">
   <div class="wrap">
-    <div class="shead shead--split">
-      <div>
-        <p class="eyebrow">At a glance</p>
-        <h2 class="d-l" id="glance-h">Three paths. Same crew, same install.</h2>
-      </div>
-      <p class="muted">Whichever you pick, the design, the permits and the install are handled by the same team. The only thing that changes is how the money works.</p>
+    <div class="head">
+      <p class="label">At a glance</p>
+      <h2 class="d-l" id="glance-h">Three paths. <em>Same crew, same install.</em></h2>
+      <p class="head__note">Whichever you pick, the design, the permits and the install are handled by the same team. The only thing that changes is how the money works.</p>
     </div>
     <div class="cards cards--3">
       <article class="card card--opt opt-buy">
@@ -51,12 +36,10 @@
 <!-- Calculator -->
 <section class="sec sec--ink" id="calc" aria-labelledby="calc-h">
   <div class="wrap">
-    <div class="shead shead--split">
-      <div>
-        <p class="eyebrow">Live comparison</p>
-        <h2 class="d-l" id="calc-h">Your bill in. 25 years out.</h2>
-      </div>
-      <p class="muted">Slide to your average monthly electric bill. The three options update instantly, and the chart shows how much each one leaves in your pocket over 25 years.</p>
+    <div class="head">
+      <p class="label">Live comparison</p>
+      <h2 class="d-l" id="calc-h">Your bill in. <em>25 years out.</em></h2>
+      <p class="head__note">Slide to your average monthly electric bill. The three options update instantly, and the chart shows how much each one leaves in your pocket over 25 years.</p>
     </div>
     <div class="cmp" data-cmp>
       {{bill}}
@@ -115,15 +98,25 @@
   </div>
 </section>
 
+<!-- What waiting costs -->
+<section class="sec" aria-labelledby="wait-h">
+  <div class="wrap">
+    <div class="head">
+      <p class="label">Waiting has a price</p>
+      <h2 class="d-l" id="wait-h">What 25 years of <em>bills add up to.</em></h2>
+      <p class="head__note">The same $220-a-month home. One line keeps paying the utility as rates rise; the other buys the system once and pays only what solar doesn't cover.</p>
+    </div>
+    {{wait}}
+  </div>
+</section>
+
 <!-- Matcher -->
 <section class="sec" id="match" aria-labelledby="match-h">
   <div class="wrap">
-    <div class="shead shead--split">
-      <div>
-        <p class="eyebrow">Which one fits me?</p>
-        <h2 class="d-l" id="match-h">Four taps. A straight answer.</h2>
-      </div>
-      <p class="muted">No email required to see your result. Answer honestly and we'll tell you which path fits, and why.</p>
+    <div class="head">
+      <p class="label">Which one fits me?</p>
+      <h2 class="d-l" id="match-h">Four taps. <em>A straight answer.</em></h2>
+      <p class="head__note">No email required to see your result. Answer honestly and we'll tell you which path fits, and why.</p>
     </div>
     <div class="match" data-match>
       <div class="match__card">
@@ -181,11 +174,9 @@
 <!-- Side-by-side table -->
 <section class="sec sec--paper2" aria-labelledby="tbl-h">
   <div class="wrap">
-    <div class="shead shead--split">
-      <div>
-        <p class="eyebrow">The fine print, in plain English</p>
-        <h2 class="d-l" id="tbl-h">Side by side. No asterisks.</h2>
-      </div>
+    <div class="head">
+      <p class="label">The fine print, in plain English</p>
+      <h2 class="d-l" id="tbl-h">Side by side. <em>No asterisks.</em></h2>
     </div>
     <div class="vt-wrap">
       <table class="vt">
@@ -209,8 +200,8 @@
 <section class="sec" aria-labelledby="faq-h">
   <div class="wrap split split--top split--faq">
     <div class="split__body sticky-lg">
-      <p class="eyebrow">Questions</p>
-      <h2 class="d-l" id="faq-h">Straight answers.</h2>
+      <p class="label">Questions</p>
+      <h2 class="d-l" id="faq-h">Straight <em>answers.</em></h2>
       <p class="muted">Still deciding? Call <a class="link-u" href="{{TEL}}">{{PHONE}}</a> and talk to the people who'll actually do the work.</p>
       <a class="btn btn--volt" href="quote.html">Get all three priced{{ic:arrow-r}}</a>
     </div>

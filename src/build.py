@@ -163,7 +163,9 @@ def header(active):
 def cta_band(title=None, sub=None):
     title = title or 'Book a free site check. <em>No pressure.</em>'
     sub = sub or "We look at your roof, your shade and a year of bills, then put purchase, finance and PPA numbers side by side on paper."
+    band = "".join(f"<span>{w}</span><em>{e}</em>" for w, e in [("Solar", "Battery backup"), ("Three prices", "Same crew"), ("Ground mounts", "Power that shows up")])
     return f"""
+<div class="marquee marquee--big" aria-hidden="true"><div class="marquee__track">{band}{band}</div></div>
 <section class="cta" aria-labelledby="cta-h">
   <img class="cta__bg" src="assets/img/hero-coast-sm.webp" srcset="assets/img/hero-coast-sm.webp 900w, assets/img/hero-coast.webp 1800w" sizes="100vw" alt="" loading="lazy">
   <div class="cta__in">
@@ -224,6 +226,30 @@ def footer():
 
 def concept_badge():
     return '<a class="concept" href="preview-pack.html">Concept for Blue Collar · <b>Preview pack</b></a>'
+
+def photo_hero(h):
+    """Inner-page hero: full-bleed photo, breadcrumb, headline with a serif accent, lede and buttons,
+    then a facts card overlapping the bottom edge. Written in each page as <!--HERO {json} -->."""
+    img = h["img"]
+    btns = "".join(btn(b[0], b[1], b[2] if len(b) > 2 else "") if (len(b) < 3 or "ghost" not in b[2])
+                   else f'<a class="btn btn--outline-light" href="{b[1]}"><span>{b[0]}</span></a>' for b in h.get("btns", []))
+    facts = "".join(f'<li><p class="kicker">{k}</p><b>{v}</b></li>' for k, v in h.get("facts", []))
+    return f"""<section class="hero hero--page" aria-labelledby="ph-h">
+  <img class="hero__bg" src="assets/img/{img}.webp" srcset="assets/img/{img}-sm.webp 900w, assets/img/{img}.webp 1800w" sizes="100vw" alt="" fetchpriority="high" style="object-position:{h.get('pos', '50% 40%')}">
+  <div class="badge" aria-hidden="true">
+    <svg viewBox="0 0 200 200"><defs><path id="badge-p" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs><text><textPath href="#badge-p" textLength="458">{h.get('badge', 'FREE SITE CHECK · NO PRESSURE · GROVER BEACH ·')}</textPath></text></svg>
+    <img src="assets/img/logo-mark.png" alt="">
+  </div>
+  <div class="wrap hero__in">
+    <nav class="crumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i></i><span>{h['crumb']}</span></nav>
+    <h1 class="d-hero d-hero--page" id="ph-h">{h['title']}</h1>
+    <div class="hero__row">
+      <p class="hero__lede">{h['lede']}</p>
+      <div class="btns">{btns}</div>
+    </div>
+  </div>
+</section>
+<div class="wrap"><ul class="facts">{facts}</ul></div>"""
 
 def payback(bill=220):
     """Year-by-year position of a purchased system for the default bill, written into the page
@@ -287,7 +313,49 @@ MAP = """<figure class="map">
       </svg>
     </figure>"""
 
-PARTIALS = {"{{towns}}": TOWNS, "{{map}}": MAP}
+ASKCARD = f"""<div class="ask-card">
+        <span class="ask-card__ic">{ic('phone')}</span>
+        <div><b>Still have a question?</b><p>Call or email the crew. A real person picks up, and it's the same people who'd do the work.</p>
+        <div class="btns"><a class="btn btn--gold btn--sm" href="{TEL}"><span>Call {PHONE}</span><i class="btn__ic">{ic('arrow-r')}</i></a><a class="btn btn--ghost btn--sm" href="mailto:{EMAIL}"><span>Email us</span></a></div></div>
+      </div>"""
+
+def wait_chart(bill=220):
+    """Cumulative spend over 25 years: utility only vs a purchased system (same model as calc.js)."""
+    rate, esc, deg, yld, ppw, off = 0.40, 0.035, 0.005, 1650, 3.10, 0.80
+    kwh = bill * 12 / rate
+    size = max(2.4, round(kwh / yld * 10) / 10)
+    cost = size * 1000 * ppw
+    U, S = [0.0], [cost]
+    for t in range(1, 26):
+        b = kwh * rate * (1 + esc) ** (t - 1)
+        avoided = size * yld * (1 - deg) ** (t - 1) * rate * (1 + esc) ** (t - 1) * off
+        U.append(U[-1] + b); S.append(S[-1] + b - avoided)
+    W, H, pl, pr, pt, pb = 1000, 400, 70, 190, 20, 40
+    hi = max(U) * 1.05
+    x = lambda i: pl + (W - pl - pr) * i / 25
+    y = lambda v: pt + (H - pt - pb) * (1 - v / hi)
+    line = lambda a: "M" + " L".join(f"{x(i):.1f} {y(v):.1f}" for i, v in enumerate(a))
+    area = line(U) + " L" + " L".join(f"{x(i):.1f} {y(v):.1f}" for i, v in reversed(list(enumerate(S)))) + " Z"
+    grid = "".join(f'<line x1="{pl}" x2="{W - pr}" y1="{y(v):.1f}" y2="{y(v):.1f}"/><text x="{pl - 12}" y="{y(v) + 4:.1f}" text-anchor="end">${v / 1000:.0f}k</text>' for v in range(0, int(hi), 20000))
+    xs = "".join(f'<text x="{x(i):.1f}" y="{H - 12}" text-anchor="middle">{"Today" if i == 0 else "Yr " + str(i)}</text>' for i in (0, 5, 10, 15, 20, 25))
+    keep = U[-1] - S[-1]
+    mid = (y(U[-1]) + y(S[-1])) / 2
+    return f"""<div class="wait">
+      <svg viewBox="0 0 {W} {H}" role="img" aria-label="Cumulative spend over 25 years: about ${U[-1]:,.0f} paying the utility versus about ${S[-1]:,.0f} with a purchased solar system">
+        <g class="wait__grid">{grid}{xs}</g>
+        <path class="wait__gap" d="{area}"/>
+        <path class="wait__line wait__line--u" d="{line(U)}" pathLength="1"/>
+        <path class="wait__line wait__line--s" d="{line(S)}" pathLength="1"/>
+        <circle class="wait__dot wait__dot--u" cx="{x(25):.1f}" cy="{y(U[-1]):.1f}" r="6"/>
+        <circle class="wait__dot wait__dot--s" cx="{x(25):.1f}" cy="{y(S[-1]):.1f}" r="6"/>
+        <g class="wait__lab"><text x="{x(25) + 16:.1f}" y="{y(U[-1]) + 5:.1f}">Utility only</text><text class="v" x="{x(25) + 16:.1f}" y="{y(U[-1]) + 25:.1f}">${U[-1]:,.0f}</text>
+        <text x="{x(25) + 16:.1f}" y="{y(S[-1]) - 16:.1f}">With solar</text><text class="v" x="{x(25) + 16:.1f}" y="{y(S[-1]) + 4:.1f}">${S[-1]:,.0f}</text></g>
+        <g class="wait__keep"><path d="M{x(25) - 14:.1f} {y(U[-1]) + 10:.1f} V {y(S[-1]) - 10:.1f}"/><text x="{x(25) - 26:.1f}" y="{mid + 5:.1f}" text-anchor="end">You keep ${keep:,.0f}</text></g>
+      </svg>
+      <ul class="wait__legend"><li><i class="lg wait__lg--u"></i>Keep paying the utility (rates +3.5% a year)</li><li><i class="lg wait__lg--s"></i>Buy the system once, pay only what solar doesn't cover</li></ul>
+    </div>"""
+
+PARTIALS = {"{{towns}}": TOWNS, "{{map}}": MAP, "{{askcard}}": ASKCARD, "{{wait}}": wait_chart()}
 
 def build():
     out = []
@@ -297,6 +365,7 @@ def build():
         m = re.match(r"\s*<!--META (.*?)-->\s*", src, re.S)
         meta = json.loads(m.group(1))
         body = src[m.end():]
+        body = re.sub(r"<!--HERO (.*?)-->", lambda mm: photo_hero(json.loads(mm.group(1))), body, flags=re.S)
         body = re.sub(r"\{\{btn:([^|}]+)\|([^|}]+)\|?([^}]*)\}\}", lambda mm: btn(mm.group(1), mm.group(2), mm.group(3)), body)
         body = re.sub(r"\{\{ic:([a-z-]+)(?::([a-z-_ ]+))?\}\}", lambda mm: ic(mm.group(1), mm.group(2) or ""), body)
         body = re.sub(r"<img (?![^>]*decoding=)", '<img decoding="async" ', body)  # decode off the main thread

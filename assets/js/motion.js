@@ -121,8 +121,8 @@
   });
 
   /* ---------- Reveal on scroll, staggered inside groups ---------- */
-  const GROUPS = '.facts, .feats, .stats ul, .bento, .calc__ways, .milestones, .cta__facts, .cards, .pillars, .kv, .leads, .towns, .opts, .team, .faq, .checks, .bat__loads, .psteps, .ftr__top, .jump, .ticks, .day__stats, .pp-stats, .vs';
-  const SINGLES = '.head .label, .head__note, .photo-card, .calc, .payback__sum, .payback__chart, .map, .who__photo, .who__text > .label, .who__q, .split__media, .phero__media, .chart, .match, .vt-wrap, .sun, .area__text > p, .hero .kicker, .hero__lede, .hero__ask, .phero__crumb, .phero__text > p, .phero__text > .btns, .phero__aside, .cta .kicker, .cta__sub, .cta .btns, .step, .day__scene, .day__side > *, .bat__out, .wiz__card, .est, .contact-card, .split__body > p, .split__body > .btn, .story__body, .quote-q, .more, .statement + .feats';
+  const GROUPS = '.facts, .feats, .stats ul, .bento, .calc__ways, .milestones, .cta__facts, .cards, .pillars, .kv, .leads, .towns, .opts, .team, .faq, .checks, .bat__loads, .psteps, .ftr__top, .jump, .ticks, .day__stats, .pp-stats, .vs, .statcards, .dark3, .leaders, .track__rows, .jstep__list, .explore__dots, .wait__legend';
+  const SINGLES = '.head .label, .head__note, .photo-card, .calc, .payback__sum, .payback__chart, .map, .who__photo, .who__text > .label, .who__q, .split__media, .phero__media, .chart, .match, .vt-wrap, .sun, .area__text > p, .hero .kicker, .hero__lede, .hero__ask, .phero__crumb, .phero__text > p, .phero__text > .btns, .phero__aside, .cta .kicker, .cta__sub, .cta .btns, .step, .day__scene, .day__side > *, .bat__out, .wiz__card, .est, .contact-card, .split__body > p, .split__body > .btn, .story__body, .quote-q, .more, .statement + .feats, .crumb, .hero__row .btns, .explore__card, .explore__lede, .bat-head, .track, .quiet__text > *, .ask-card, .qa__side > .label, .story2__body > p, .wait';
   const reveal = (el, delay) => {
     if (el.classList.contains('rv') || el.closest('[hidden]') || !mayHide(el)) return;   // hidden panels (e.g. the quote thank-you) are left alone
     el.classList.add('rv'); if (delay) el.style.setProperty('--rd', delay + 's');
@@ -131,11 +131,18 @@
   $$(GROUPS).forEach(g => [...g.children].forEach((c, i) => reveal(c, Math.min(i, 8) * 0.07)));
   $$(SINGLES).forEach(el => reveal(el, el.closest('.hero, .phero, .cta') ? 0.25 : 0));
   // hero copy follows the headline when the page opens behind a cover
-  [['.hero__lede', .35], ['.hero__ask', .45], ['.hero .kicker', .05]].forEach(([s, t]) => { const el = $(s); if (el && el.classList.contains('rv')) el.style.setProperty('--rd', t + 's'); });
+  [['.hero__lede', .35], ['.hero__ask', .45], ['.hero__row .btns', .45], ['.hero .kicker', .05], ['.crumb', .05]].forEach(([s, t]) => { const el = $(s); if (el && el.classList.contains('rv')) el.style.setProperty('--rd', t + 's'); });
+
+  /* ---------- Photos open out of a clipped frame ---------- */
+  $$('.split__media, .story2__media, .mosaic figure, .journey__media, .explore__stage, .who__photo').forEach((el) => {
+    if (!mayHide(el) || el.classList.contains('rv')) return;
+    el.classList.add('wipe');
+    onView(el, () => el.classList.add('is-in'), '0px 0px -6% 0px');
+  });
 
   /* ---------- Counters ---------- */
   const fmtNum = (v, dec) => v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
-  $$('.milestones b, .stats b, .payback__big, .pp-stats dd, .photo-card b, .bat__hrs').forEach((el) => {
+  $$('.milestones b, .stats b, .payback__big, .pp-stats dd, .photo-card b, .bat__hrs, .statcards b').forEach((el) => {
     const tn = [...el.childNodes].find(n => n.nodeType === 3 && /\d/.test(n.textContent));
     if (!tn || !mayHide(el)) return;
     const m = tn.textContent.match(/^(\D*)([\d,]*\.?\d+)(.*)$/s);

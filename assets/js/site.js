@@ -122,6 +122,62 @@
     upd();
   }
 
+  /* ---------- Services: tap a hotspot on the house to explain that part ---------- */
+  $$('[data-explore]').forEach(box => {
+    const items = $$('i', $('[data-ex-items]', box).content);
+    const hots = $$('.hot', box), tabs = $$('[role="tab"]', box), card = $('.explore__card', box);
+    const f = { n: $('[data-ex-n]', box), k: $('[data-ex-k]', box), t: $('[data-ex-t]', box), d: $('[data-ex-d]', box), a: $('[data-ex-a]', box) };
+    let cur = 0, timer = 0, touched = false;
+    const show = (i) => {
+      cur = i; const it = items[i];
+      hots.forEach((h, k) => h.classList.toggle('is-on', k === i));
+      tabs.forEach((t, k) => t.setAttribute('aria-selected', String(k === i)));
+      box.dataset.part = i;
+      f.n.textContent = String(i + 1).padStart(2, '0'); f.k.textContent = it.dataset.k; f.t.innerHTML = it.dataset.t; f.d.textContent = it.dataset.d;
+      f.a.href = it.dataset.a; f.a.firstChild.nodeValue = it.dataset.al + ' ';
+      card.classList.remove('swap'); void card.offsetWidth; card.classList.add('swap');
+    };
+    const pick = (i) => { touched = true; clearInterval(timer); show(i); };
+    [...hots, ...tabs].forEach(b => b.addEventListener('click', () => pick(+b.dataset.ex)));
+    // gently tour the parts while it's on screen, until someone picks one
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) new IntersectionObserver(([e]) => {
+      clearInterval(timer);
+      if (e.isIntersecting && !touched) timer = setInterval(() => show((cur + 1) % items.length), 3600);
+    }, { threshold: 0.4 }).observe(box);
+  });
+
+  /* ---------- Process journey: sticky photo and rail follow the step in view ---------- */
+  $$('[data-journey]').forEach(j => {
+    const steps = $$('[data-j-step]', j), imgs = $$('[data-j-img]', j), cells = $$('[data-j-cell]', j);
+    const num = $('[data-j-num]', j), name = $('[data-j-name]', j), time = $('[data-j-time]', j);
+    let cur = -1, raf = 0;
+    const update = () => {
+      raf = 0;
+      const mid = innerHeight * 0.5; let idx = 0;
+      steps.forEach((s, i) => {
+        const r = s.getBoundingClientRect();
+        cells[i].style.setProperty('--f', Math.max(0, Math.min(1, (mid - r.top) / Math.max(1, r.height))).toFixed(3));
+        if (r.top <= mid) idx = i;
+      });
+      if (idx === cur) return;
+      cur = idx;
+      imgs.forEach((im, k) => im.classList.toggle('is-on', k === idx));
+      cells.forEach((c, k) => c.classList.toggle('is-now', k === idx));
+      steps.forEach((s, k) => s.classList.toggle('is-now', k === idx));
+      name.innerHTML = steps[idx].dataset.name; time.textContent = steps[idx].dataset.time;
+      num.classList.add('is-swap'); num.textContent = String(idx + 1).padStart(2, '0');
+      requestAnimationFrame(() => requestAnimationFrame(() => num.classList.remove('is-swap')));
+    };
+    cells.forEach((c, i) => $('button', c).addEventListener('click', () => {
+      const y = steps[i].getBoundingClientRect().top + scrollY - innerHeight * 0.3;
+      scrollTo({ top: y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }));
+    j.classList.add('is-live');
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    addEventListener('resize', update);
+    update();
+  });
+
   /* ---------- Footer year ---------- */
   $$('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
 })();
