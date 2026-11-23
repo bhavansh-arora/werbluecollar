@@ -88,7 +88,7 @@ def head(meta):
 <meta property="og:image" content="assets/img/crew-install.webp">
 <meta property="og:type" content="website">
 <link rel="icon" href="assets/img/logo-mark.png">
-<script>(function(){{var d=document.documentElement;d.classList.add('js');try{{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add(sessionStorage.getItem('bce-boot')?'pt-in':'is-loading');}}catch(e){{}}setTimeout(function(){{d.classList.remove('is-loading','pt-in')}},3600);}})();</script>{preload}
+<script>(function(){{var d=document.documentElement;d.classList.add('js');try{{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var t=+localStorage.getItem('bce-boot')||0;d.classList.add(sessionStorage.getItem('bce-boot')||Date.now()-t<864e5?'pt-in':'is-loading');}}catch(e){{}}setTimeout(function(){{d.classList.remove('is-loading','pt-in')}},3600);}})();</script>{preload}
 <link rel="stylesheet" href="assets/css/site.css">
 <script type="application/ld+json">{json.dumps({
     "@context": "https://schema.org", "@type": "HomeAndConstructionBusiness",

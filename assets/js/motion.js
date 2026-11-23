@@ -38,7 +38,8 @@
       if (done) return; done = true;
       cells.forEach(c => c.classList.add('on')); num.textContent = '100'; lab.textContent = 'Fully charged';
       loader.classList.add('is-charged');
-      try { sessionStorage.setItem('bce-boot', '1'); } catch (e) {}
+      // remembered across tabs for a day, so a page opened in a new tab or window doesn't replay the loader
+      try { sessionStorage.setItem('bce-boot', '1'); localStorage.setItem('bce-boot', String(Date.now())); } catch (e) {}
       setTimeout(() => {
         loader.classList.add('is-done');
         setTimeout(uncover, 320);
