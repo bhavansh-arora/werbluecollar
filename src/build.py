@@ -87,7 +87,7 @@ def head(meta):
 <link rel="preload" href="assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/barlow-sc-700.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/site.css">{''.join(f'\n<link rel="modulepreload" href="assets/js/{m}">' for m in meta.get("modulepreload", []))}
 <script type="application/ld+json">{json.dumps({
     "@context": "https://schema.org", "@type": "HomeAndConstructionBusiness",
     "name": "Blue Collar Energy", "telephone": "+1-805-441-0939", "email": EMAIL,
@@ -210,11 +210,12 @@ BILL = """<div class="cmp__ctrl">
 TOWNS = ('<ul class="towns"><li class="towns__hq">' + ic("pin") + 'Grover Beach · HQ</li>' +
          "".join(f"<li>{t}</li>" for t in ["Pismo Beach", "Arroyo Grande", "San Luis Obispo", "Santa Maria", "Oceano", "Nipomo", "Avila Beach"]) + "</ul>")
 
-MAP = """<figure class="map">
+MAP = """<figure class="map" data-tilt="7">
       <svg viewBox="30 92 460 352" role="img" aria-label="Map of the Central Coast service area, centered on Grover Beach">
         <path class="map__land" d="M500 0H215c-12 40-6 70-28 104-16 26-46 36-58 66-10 24 4 52-4 80-8 30-34 44-40 74-6 30 10 60 4 92-4 26-22 52-26 94h437z"/>
         <path class="map__coast" d="M215 0c-12 40-6 70-28 104-16 26-46 36-58 66-10 24 4 52-4 80-8 30-34 44-40 74-6 30 10 60 4 92-4 26-22 52-26 94"/>
         <circle class="map__reach" cx="205" cy="268" r="170"/>
+        <g class="map__routes"><path d="M205 268 Q203 186 262 130"/><path d="M205 268 Q199 224 162 198"/><path d="M205 268 Q208 250 196 236"/><path d="M205 268 Q225 258 246 266"/><path d="M205 268 Q196 281 200 296"/><path d="M205 268 Q248 289 262 336"/><path d="M205 268 Q279 326 286 420"/></g>
         <text class="map__sea" x="46" y="132">Pacific</text><text class="map__sea" x="46" y="150">Ocean</text>
         <g class="map__town"><circle cx="262" cy="130" r="4.5"/><text x="273" y="134">San Luis Obispo</text></g>
         <g class="map__town"><circle cx="162" cy="198" r="4"/><text x="173" y="202">Avila Beach</text></g>
@@ -243,6 +244,7 @@ def build():
         body = body.replace("{{bill}}", BILL.replace("{id}", p.stem)).replace("{{PHONE}}", PHONE).replace("{{TEL}}", TEL).replace("{{EMAIL}}", EMAIL).replace("{{ADDR}}", ADDR)
         cta = cta_band(meta.get("cta_title"), meta.get("cta_sub")) if meta.get("cta", True) else ""
         scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site"] + meta.get("scripts", []))
+        scripts += "".join(f'<script type="module" src="assets/js/{s}.js"></script>' for s in meta.get("modules", []))
         html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + header(meta.get("nav", "")) +
                 f'\n<main id="main">\n{body}\n{cta}\n</main>' + footer() +
                 (concept_badge() if meta.get("badge", True) else "") + f"\n{scripts}\n</body>\n</html>\n")

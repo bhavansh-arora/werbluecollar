@@ -40,6 +40,47 @@
     }));
   });
 
+  /* ---------- Depth: pointer tilt with glare, and a spotlight on dark sections ----------
+     Mouse/trackpad only, and off for reduced motion. Nothing here changes what is visible. */
+  const motionOK = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (motionOK && matchMedia('(pointer: fine)').matches) {
+    $$('[data-tilt]').forEach(el => {
+      const max = parseFloat(el.dataset.tilt) || 6;
+      let raf = 0;
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          el.style.setProperty('--tilt-x', ((px - 0.5) * 2 * max).toFixed(2) + 'deg');
+          el.style.setProperty('--tilt-y', ((0.5 - py) * 2 * max).toFixed(2) + 'deg');
+          el.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
+          el.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+          el.classList.add('is-tilting');
+        });
+      });
+      el.addEventListener('pointerleave', () => {
+        cancelAnimationFrame(raf);
+        el.style.setProperty('--tilt-x', '0deg'); el.style.setProperty('--tilt-y', '0deg');
+        el.classList.remove('is-tilting');
+      });
+    });
+    $$('.sec--ink').forEach(sec => sec.addEventListener('pointermove', (e) => {
+      const r = sec.getBoundingClientRect();
+      sec.style.setProperty('--sx', (e.clientX - r.left) + 'px');
+      sec.style.setProperty('--sy', (e.clientY - r.top) + 'px');
+    }));
+  }
+
+  /* ---------- Exploded panel: point at a layer in the list to light it up ---------- */
+  $$('[data-layers]').forEach(box => {
+    const panel = $('.panel3d', box);
+    $$('[data-layer]', box).forEach(li => {
+      li.addEventListener('mouseenter', () => { panel.dataset.active = li.dataset.layer; });
+      li.addEventListener('mouseleave', () => { delete panel.dataset.active; });
+    });
+  });
+
   /* ---------- Live sun widget (Grover Beach, CA) ---------- */
   const sunEl = $('[data-sun]');
   if (sunEl) {

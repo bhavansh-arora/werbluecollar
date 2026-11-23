@@ -15,6 +15,8 @@
 <link rel="preload" href="assets/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/barlow-sc-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/site.css">
+<link rel="modulepreload" href="assets/js/vendor/three.module.min.js">
+<link rel="modulepreload" href="assets/js/hero3d.js">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "HomeAndConstructionBusiness", "name": "Blue Collar Energy", "telephone": "+1-805-441-0939", "email": "info@werbluecollar.com", "address": {"@type": "PostalAddress", "streetAddress": "1198 Farroll Rd, Suite 4", "addressLocality": "Grover Beach", "addressRegion": "CA", "postalCode": "93433", "addressCountry": "US"}, "areaServed": ["Grover Beach", "Pismo Beach", "Arroyo Grande", "San Luis Obispo", "Santa Maria"], "url": "https://www.werbluecollar.com/"}</script>
 </head>
 <body class="">
@@ -46,7 +48,12 @@
 <main id="main">
 <!-- ============ HERO ============ -->
 <section class="hero" aria-labelledby="hero-h">
-  <img decoding="async" class="hero__bg" src="assets/img/hero-coast.webp" srcset="assets/img/hero-coast-sm.webp 900w, assets/img/hero-coast.webp 1800w" sizes="100vw" alt="" fetchpriority="high">
+  <div class="hero__scene" data-hero3d>
+    <img decoding="async" class="hero__poster" src="assets/img/hero-3d.webp" srcset="assets/img/hero-3d-sm.webp 900w, assets/img/hero-3d.webp 1800w" sizes="100vw" alt="3D model of a Central Coast home with ten solar panels on the roof at golden hour" fetchpriority="high">
+    <canvas aria-hidden="true"></canvas>
+  </div>
+  <div class="hero__tip" data-hero3d-tip hidden></div>
+
   <div class="wrap hero__grid">
     <div class="hero__text">
       <p class="eyebrow">Solar installer · Grover Beach, California</p>
@@ -58,16 +65,27 @@
       </div>
     </div>
 
-    <div class="picker" data-picker>
-      <h2 class="picker__h">What are we powering?</h2>
-      <div class="picker__opts" role="group" aria-label="Project type">
-        <button type="button" class="picker__opt" data-type="home" aria-pressed="true"><svg aria-hidden="true"><use href="#i-home"/></svg><b>Home</b><small>Roof-mounted solar</small></button>
-        <button type="button" class="picker__opt" data-type="business" aria-pressed="false"><svg aria-hidden="true"><use href="#i-building"/></svg><b>Business</b><small>Commercial &amp; flat roofs</small></button>
-        <button type="button" class="picker__opt" data-type="battery" aria-pressed="false"><svg aria-hidden="true"><use href="#i-battery"/></svg><b>Battery</b><small>New or existing solar</small></button>
-        <button type="button" class="picker__opt" data-type="ground" aria-pressed="false"><svg aria-hidden="true"><use href="#i-ground"/></svg><b>Ground mount</b><small>Ranch, vineyard, acreage</small></button>
+    <aside class="hud" aria-label="About the 3D model">
+      <p class="hud__k">The model on screen</p>
+      <dl>
+        <div><dt>System</dt><dd>4.0 kW · 10 panels</dd></div>
+        <div><dt>Producing</dt><dd data-hero3d-kw>3.37 kW</dd></div>
+        <div><dt>Battery</dt><dd data-hero3d-bat>62%</dd></div>
+      </dl>
+      <p class="hud__hint"><svg aria-hidden="true"><use href="#i-sun"/></svg>Golden hour, illustrative. Hover a panel to inspect it.</p>
+    </aside>
+  </div>
+
+  <div class="dock" data-picker>
+    <div class="wrap dock__in">
+      <h2 class="dock__h">What are we powering?</h2>
+      <div class="dock__opts" role="group" aria-label="Project type">
+        <button type="button" data-type="home" aria-pressed="true"><svg aria-hidden="true"><use href="#i-home"/></svg>Home</button>
+        <button type="button" data-type="business" aria-pressed="false"><svg aria-hidden="true"><use href="#i-building"/></svg>Business</button>
+        <button type="button" data-type="battery" aria-pressed="false"><svg aria-hidden="true"><use href="#i-battery"/></svg>Battery</button>
+        <button type="button" data-type="ground" aria-pressed="false"><svg aria-hidden="true"><use href="#i-ground"/></svg>Ground mount</button>
       </div>
-      <a class="btn btn--volt btn--block" href="quote.html?type=home" data-picker-go>Start my quote<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
-      <ul class="picker__ticks"><li><svg aria-hidden="true"><use href="#i-check"/></svg>Free site check</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>No obligation</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>About 60 seconds</li></ul>
+      <a class="btn btn--light" href="quote.html?type=home" data-picker-go>Start my quote, about 60 seconds<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
     </div>
   </div>
 </section>
@@ -111,19 +129,19 @@
       <a class="link-u" href="services.html">All services<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
     </div>
     <ul class="jobs">
-      <li><a class="job" href="services.html#homes">
+      <li><a class="job" data-tilt="6" href="services.html#homes">
         <span class="job__img"><img decoding="async" src="assets/img/home-hills-sm.webp" alt="Single-storey home with a roof-mounted solar array below golden hills"></span>
         <span class="job__t">Homes<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
         <span class="job__d">Roof-mounted systems sized to your roof, your shade and a year of your bills.</span></a></li>
-      <li><a class="job" href="services.html#business">
+      <li><a class="job" data-tilt="6" href="services.html#business">
         <span class="job__img"><img decoding="async" src="assets/img/commercial-sm.webp" alt="Commercial flat-roof solar array overlooking the coast"></span>
         <span class="job__t">Businesses<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
         <span class="job__d">Commercial and flat-roof systems, with the permits and utility paperwork handled.</span></a></li>
-      <li><a class="job" href="services.html#battery">
+      <li><a class="job" data-tilt="6" href="services.html#battery">
         <span class="job__img"><img decoding="async" src="assets/img/battery-sm.webp" alt="Home battery mounted on a garage wall"></span>
         <span class="job__t">Battery storage<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
         <span class="job__d">Stores daytime solar for the evening and keeps essentials running in an outage.</span></a></li>
-      <li><a class="job" href="services.html#ground">
+      <li><a class="job" data-tilt="6" href="services.html#ground">
         <span class="job__img"><img decoding="async" src="assets/img/vineyard-sm.webp" alt="Ground-mounted solar array beside a hillside vineyard"></span>
         <span class="job__t">Ground mounts<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
         <span class="job__d">Arrays for ranches, vineyards and properties where the roof isn't the best spot.</span></a></li>
@@ -223,11 +241,43 @@
   </div>
 </section>
 
+<!-- ============ INSIDE A PANEL (CSS 3D, separates as you scroll) ============ -->
+<section class="sec sec--ink layers-sec" aria-labelledby="layers-h">
+  <div class="wrap layers" data-layers>
+    <div class="layers__text">
+      <p class="eyebrow">What goes on your roof</p>
+      <h2 class="d-l" id="layers-h">Seven parts. No mystery.</h2>
+      <p class="lede">A solar panel is a well-built sandwich, not magic. Here is every layer, so you know exactly what you're paying for and what we're bolting to your roof.</p>
+      <ol class="layers__list">
+        <li data-layer="6"><span class="layers__sw layers__sw--frame"></span><b>Aluminum frame</b><span>Keeps it square and bolts to the racking.</span></li>
+        <li data-layer="5"><span class="layers__sw layers__sw--glass"></span><b>Tempered glass</b><span>Lets the light in, keeps hail and weather out.</span></li>
+        <li data-layer="4"><span class="layers__sw layers__sw--eva"></span><b>Encapsulant</b><span>Seals the cells in and cushions them.</span></li>
+        <li data-layer="3"><span class="layers__sw layers__sw--cells"></span><b>Solar cells</b><span>Silicon that turns sunlight into DC power.</span></li>
+        <li data-layer="2"><span class="layers__sw layers__sw--eva"></span><b>Encapsulant</b><span>A second seal under the cells.</span></li>
+        <li data-layer="1"><span class="layers__sw layers__sw--back"></span><b>Backsheet</b><span>Insulates and protects the back of the panel.</span></li>
+        <li data-layer="0"><span class="layers__sw layers__sw--jb"></span><b>Junction box</b><span>Where the panel's wiring joins your system.</span></li>
+      </ol>
+    </div>
+    <div class="panel3d" data-tilt="10" aria-hidden="true">
+      <div class="panel3d__stack">
+        <i class="pl pl--jb" style="--i:0"></i>
+        <i class="pl pl--back" style="--i:1"></i>
+        <i class="pl pl--eva" style="--i:2"></i>
+        <i class="pl pl--cells" style="--i:3"></i>
+        <i class="pl pl--eva" style="--i:4"></i>
+        <i class="pl pl--glass" style="--i:5"></i>
+        <i class="pl pl--frame" style="--i:6"></i>
+      </div>
+      <span class="panel3d__shadow"></span>
+    </div>
+  </div>
+</section>
+
 <!-- ============ THE CREW ============ -->
 <section class="sec sec--paper2" aria-labelledby="who-h">
   <div class="wrap">
     <div class="crew">
-      <figure class="crew__photo">
+      <figure class="crew__photo" data-tilt="4">
         <img decoding="async" src="assets/img/team-sm.webp" srcset="assets/img/team-sm.webp 900w, assets/img/team.webp 1800w" sizes="(min-width:1000px) 58vw, 100vw" alt="The Blue Collar Energy crew standing in front of the company sign" loading="lazy">
       </figure>
       <div class="crew__text">
@@ -261,11 +311,12 @@
       <p>From our shop on Farroll Road we cover Grover Beach, Pismo Beach, Arroyo Grande, San Luis Obispo, Santa Maria and the rest of the Central Coast.</p>
       <ul class="towns"><li class="towns__hq"><svg aria-hidden="true"><use href="#i-pin"/></svg>Grover Beach · HQ</li><li>Pismo Beach</li><li>Arroyo Grande</li><li>San Luis Obispo</li><li>Santa Maria</li><li>Oceano</li><li>Nipomo</li><li>Avila Beach</li></ul>
     </div>
-    <figure class="map">
+    <figure class="map" data-tilt="7">
       <svg viewBox="30 92 460 352" role="img" aria-label="Map of the Central Coast service area, centered on Grover Beach">
         <path class="map__land" d="M500 0H215c-12 40-6 70-28 104-16 26-46 36-58 66-10 24 4 52-4 80-8 30-34 44-40 74-6 30 10 60 4 92-4 26-22 52-26 94h437z"/>
         <path class="map__coast" d="M215 0c-12 40-6 70-28 104-16 26-46 36-58 66-10 24 4 52-4 80-8 30-34 44-40 74-6 30 10 60 4 92-4 26-22 52-26 94"/>
         <circle class="map__reach" cx="205" cy="268" r="170"/>
+        <g class="map__routes"><path d="M205 268 Q203 186 262 130"/><path d="M205 268 Q199 224 162 198"/><path d="M205 268 Q208 250 196 236"/><path d="M205 268 Q225 258 246 266"/><path d="M205 268 Q196 281 200 296"/><path d="M205 268 Q248 289 262 336"/><path d="M205 268 Q279 326 286 420"/></g>
         <text class="map__sea" x="46" y="132">Pacific</text><text class="map__sea" x="46" y="150">Ocean</text>
         <g class="map__town"><circle cx="262" cy="130" r="4.5"/><text x="273" y="134">San Luis Obispo</text></g>
         <g class="map__town"><circle cx="162" cy="198" r="4"/><text x="173" y="202">Avila Beach</text></g>
@@ -331,6 +382,6 @@
   <a href="tel:+18054410939"><svg aria-hidden="true"><use href="#i-phone"/></svg>Call</a>
   <a class="q" href="quote.html">Free quote<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
 </nav><a class="concept" href="preview-pack.html">Concept for Blue Collar · <b>Preview pack</b></a>
-<script src="assets/js/site.js" defer></script><script src="assets/js/calc.js" defer></script>
+<script src="assets/js/site.js" defer></script><script src="assets/js/calc.js" defer></script><script type="module" src="assets/js/hero3d.js"></script>
 </body>
 </html>

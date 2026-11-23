@@ -23,6 +23,19 @@ A static multi-page site. No framework and no build tooling are needed to host i
   are written into the HTML (see `BILL` in `src/build.py` and the option cards), so the page is complete on first paint.
   If you change `ASSUME`, update those defaults too.
 - Shared blocks (map, town list, bill slider, CTA, footer) are partials in `src/build.py`.
+
+## 3D and motion
+- **Hero scene** (`assets/js/hero3d.js`, Three.js r169 vendored in `assets/js/vendor/`, MIT): a procedural
+  Central Coast home with the 4.0 kW / 10-panel array the $220 calculator default sizes. No model files.
+  It shows `assets/img/hero-3d.webp` (a render of the same scene) until the first frame is drawn, pauses
+  off screen, and draws one still frame for reduced-motion users. Hover a panel to inspect it.
+- **Regenerating the poster** after changing the scene: open `index.html#poster` over http (the `#poster`
+  hash freezes the scene at t=0), screenshot `.hero__scene` at 1440x900 @1.25x, save as
+  `hero-3d.webp` (1800w) and `hero-3d-sm.webp` (900w).
+- **Exploded panel**, **3D map**, **tilt cards** and **scroll depth** are CSS 3D plus a little JS in `site.js`.
+  Scroll-linked effects use CSS scroll timelines (Chrome, Edge, Safari 26+); other browsers show them still.
+- The rule throughout: motion decorates, it never hides content. Nothing starts invisible.
+- ES modules don't run from `file://`; preview with any static server (e.g. `python3 -m http.server`).
 - **Calculator assumptions** live in one object, `ASSUME`, at the top of `assets/js/calc.js`
   (utility rate, $/W, loan APR/term, PPA rate and escalator, production, net-billing value).
   The text explaining the assumptions on the page updates automatically.
