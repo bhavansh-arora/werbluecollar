@@ -951,6 +951,10 @@ html.is-loading .hero__bg.plx, html.pt-in .hero__bg.plx { scale: 1.2; }
 /* The gradient is painted through each letter's own box, so the box must be taller than the glyphs:
    a tight line-height cut off the tops of B, l and C. Room above and below, page spacing unchanged. */
 .ftr__word, .ftr__word.is-split span { line-height: 1.08; padding-block: .04em; }
+/* Same on the sides: the tight letter-spacing makes each box narrower than its glyph. Widen the
+   painted box with padding and cancel it with negative margin, so the spacing stays the same. */
+.ftr__word.is-split span { padding-inline: .12em; margin-inline: -.12em; }
+.ftr__word { padding-inline: .06em; letter-spacing: -0.035em; }   /* tight, but no glyphs touching */
 .ftr__word { margin-block: clamp(20px, 3vw, 44px) clamp(4px, 1vw, 14px); }
 .ftr__word.is-live span { transition: translate .5s var(--out); }
 
