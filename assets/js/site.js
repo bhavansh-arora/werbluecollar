@@ -32,7 +32,7 @@
      thread. Paused off screen, they stop invalidating the page every frame, which is what made
      each scroll frame pay for a full style and layout pass. */
   if ('IntersectionObserver' in window) {
-    const zones = $$('.map, .day__scene, .explore__scene, .track, .hero, .topbar, .marquee, .split__media, .dot--live, .loader');
+    const zones = $$('.map, .day__scene, .explore__scene, .track, .hero, .topbar, .marquee, .split__media, .dot--live, .loader, .cta, .ftr, .sec--ink, .dark3');
     const io = new IntersectionObserver((es) => es.forEach(e => e.target.classList.toggle('is-off', !e.isIntersecting)), { rootMargin: '120px 0px' });
     zones.forEach(z => io.observe(z));
   }

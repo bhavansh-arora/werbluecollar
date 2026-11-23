@@ -478,7 +478,7 @@ h3 { font-weight: 650; letter-spacing: -0.025em; line-height: 1.2; }
 @media (min-width: 900px) { .cta__facts { grid-template-columns: repeat(3, 1fr); } }
 
 /* ---------- Footer ---------- */
-.ftr { margin: var(--inset); border-radius: var(--r-xl); background: radial-gradient(800px 400px at 50% 100%, rgba(240, 171, 60, .14), transparent 70%), var(--ink); color: var(--t-light); padding: clamp(48px, 6vw, 80px) var(--gutter) 28px; overflow: hidden; }
+.ftr { margin: var(--inset) var(--inset) 0; border-radius: var(--r-xl) var(--r-xl) 0 0; background: radial-gradient(800px 400px at 50% 100%, rgba(240, 171, 60, .14), transparent 70%), var(--ink); color: var(--t-light); padding: clamp(48px, 6vw, 80px) var(--gutter) 28px; overflow: hidden; }
 .ftr__in { max-width: var(--maxw); margin-inline: auto; }
 .ftr__top { display: grid; gap: 36px 24px; grid-template-columns: 1fr 1fr; }
 .ftr__brand { grid-column: 1 / -1; display: grid; gap: 18px; justify-items: start; }
@@ -501,7 +501,7 @@ h3 { font-weight: 650; letter-spacing: -0.025em; line-height: 1.2; }
 .mbar a.q { background: var(--gold); color: var(--ink); }
 .mbar svg { width: 17px; height: 17px; }
 @media (min-width: 900px) { .mbar { display: none; } }
-@media (max-width: 899px) { .ftr { margin-bottom: 76px; } }
+@media (max-width: 899px) { .ftr { padding-bottom: 96px; } }   /* room for the quick-action bar, inside the footer */
 .concept { position: fixed; right: 16px; bottom: 16px; z-index: 55; display: none; gap: 6px; padding: 9px 16px; border-radius: 999px; background: var(--white); color: var(--ink); font-size: 13px; box-shadow: 0 16px 36px -16px rgba(19, 32, 47, .45); opacity: 0; pointer-events: none; transition: opacity .3s; }
 .concept b { color: var(--accent); }
 .concept.on { opacity: 1; pointer-events: auto; }
@@ -1279,3 +1279,72 @@ html.is-loading .hero__bg.plx, html.pt-in .hero__bg.plx { scale: 1.2; }
   .topbar__track, .marquee__track, .badge svg, .map__routes path, .float, .hot::before, .hot::after, .explore__glint, .explore__clouds, .explore__flow, .track__bar i { animation: none; }
   *, *::before, *::after { transition-duration: .01ms !important; }
 }
+
+/* ==========================================================================
+   Bold layer: light, depth and motion. Everything here animates transform,
+   opacity or a small text background only, and pauses off screen (.is-off).
+   ========================================================================== */
+
+/* Hero light: slow aurora and turning sun rays between the photo and the copy */
+.hero__in { position: relative; z-index: 1; }
+.badge { z-index: 1; }
+.aurora { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.aurora i { position: absolute; width: 46vw; max-width: 680px; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgba(240, 171, 60, .34), rgba(240, 171, 60, 0) 72%); animation: aurora 20s ease-in-out infinite alternate; will-change: transform; }
+.aurora i:nth-child(1) { left: -12%; top: 28%; }
+.aurora i:nth-child(2) { right: -8%; top: -24%; background: radial-gradient(closest-side, rgba(75, 133, 214, .32), rgba(75, 133, 214, 0) 72%); animation-duration: 26s; animation-delay: -8s; }
+.aurora i:nth-child(3) { left: 34%; bottom: -46%; background: radial-gradient(closest-side, rgba(226, 132, 58, .28), rgba(226, 132, 58, 0) 72%); animation-duration: 30s; animation-delay: -15s; }
+@keyframes aurora { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(9vw, -7vh, 0) scale(1.18); } 100% { transform: translate3d(-7vw, 6vh, 0) scale(.9); } }
+.sunrays { position: absolute; z-index: 0; width: 104vmax; aspect-ratio: 1; right: -52vmax; top: -52vmax; pointer-events: none; opacity: .9;
+  background: repeating-conic-gradient(from 0deg, rgba(248, 205, 133, .11) 0deg 3.5deg, rgba(248, 205, 133, 0) 3.5deg 12deg);
+  -webkit-mask: radial-gradient(closest-side, #000 8%, rgba(0, 0, 0, .55) 34%, transparent 66%); mask: radial-gradient(closest-side, #000 8%, rgba(0, 0, 0, .55) 34%, transparent 66%);
+  animation: spin 110s linear infinite; will-change: transform; }
+.sunrays--cta { right: auto; left: 50%; top: auto; bottom: -70vmax; margin-left: -52vmax; opacity: .75; animation-duration: 140s; animation-direction: reverse; }
+.cta__in { position: relative; z-index: 1; }
+
+/* Gold accent words: a light sweeps across them every few seconds */
+.hero em, .cta em { background: linear-gradient(100deg, var(--gold-light) 0%, var(--gold-light) 38%, #fffaf0 50%, var(--gold-light) 62%, var(--gold-light) 100%) 100% 0 / 260% 100% no-repeat;
+  -webkit-background-clip: text; background-clip: text; color: transparent; padding-inline: .1em; margin-inline: -.1em; animation: sheen 9s ease-in-out 1.2s infinite; }
+@keyframes sheen { 0%, 78% { background-position: 100% 0; } 96%, 100% { background-position: 0 0; } }
+
+/* Scroll progress: a thin gold line along the top edge */
+.progress { position: fixed; left: 0; right: 0; top: 0; z-index: 90; height: 3px; pointer-events: none; }
+.progress i { display: block; height: 100%; will-change: transform; background: linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-light)); transform: scaleX(0); transform-origin: 0 50%; box-shadow: 0 0 12px rgba(240, 171, 60, .7); }
+
+/* Cursor ring (mouse only): grows over anything you can click, says "View" over photos */
+.cur { position: fixed; left: 0; top: 0; z-index: 3100; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; border: 1.5px solid var(--gold); pointer-events: none; opacity: 0; display: grid; place-items: center; transition: opacity .3s, scale .35s var(--out), background-color .3s, border-color .3s; will-change: transform; }
+.cur.on { opacity: .95; }
+.cur.is-link { scale: 1.65; background: rgba(240, 171, 60, .16); }
+.cur.is-img { scale: 2.3; background: var(--gold); border-color: var(--gold); }
+.cur span { font-family: var(--f-mono); font-size: 6px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); opacity: 0; transition: opacity .2s; }
+.cur.is-img span { opacity: 1; }
+.cur.is-down { scale: .8; }
+
+/* Buttons: a light sweeps across on hover */
+.btn { position: relative; overflow: hidden; isolation: isolate; }
+.btn::after { content: ""; position: absolute; top: -10%; bottom: -10%; left: -70%; width: 45%; pointer-events: none; background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .5), rgba(255, 255, 255, 0)); transform: skewX(-20deg); }
+.btn:hover::after { transform: skewX(-20deg) translateX(480%); transition: transform .9s var(--out); }
+
+/* Cards tilt toward the cursor (set by motion.js) */
+.tilt { will-change: auto; }   /* the tilt is a flat perspective() transform: no 3D context needed */
+
+/* Word band: outlined words between solid ones; the band leans with scroll speed (motion.js) */
+.marquee--big { will-change: transform; }
+.marquee--big span:nth-of-type(even) { color: transparent; -webkit-text-stroke: 1.6px var(--ink); }
+
+/* Footer wordmark: a wave of light rolls across the letters */
+.ftr__word.is-split span { background-image: linear-gradient(105deg, rgba(255, 250, 235, 0) 40%, rgba(255, 250, 235, .9) 50%, rgba(255, 250, 235, 0) 60%), linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 55%, var(--gold-dim) 100%);
+  background-size: 320% 100%, 100% 100%; background-position: 160% 0, 0 0; background-repeat: no-repeat; }
+/* plays once as the letters land, and again whenever the pointer passes over the word */
+.ftr__word.is-in span { animation: wave 1.6s ease-in-out both; animation-delay: calc(1.3s + var(--ld) * 1.4); }
+.ftr__word.is-in.wave-again span { animation-name: wave2; animation-delay: calc(var(--ld) * 1.4); }
+@keyframes wave { from { background-position: 160% 0, 0 0; } to { background-position: -60% 0, 0 0; } }
+@keyframes wave2 { from { background-position: 160% 0, 0 0; } to { background-position: -60% 0, 0 0; } }
+.ftr { position: relative; }
+.ftr::before { content: ""; position: absolute; left: 50%; bottom: -30%; width: 90%; aspect-ratio: 2.4; margin-left: -45%; border-radius: 50%; pointer-events: none; background: radial-gradient(closest-side, rgba(240, 171, 60, .22), transparent 70%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora i, .sunrays, .hero em, .cta em, .ftr__word span { animation: none !important; }
+  .cur, .progress { display: none; }
+}
+/* Slow devices (detected by motion.js): decorative loops hold still */
+html.lite .aurora i, html.lite .sunrays, html.lite .hero em, html.lite .cta em { animation: none !important; }

@@ -192,14 +192,11 @@
     const max = () => root.scrollHeight - innerHeight;
     const go = (y) => { scrollTo({ top: y, behavior: 'instant' }); };
     const tick = () => {
-      cur += (target - cur) * 0.11;
-      const step = (target - cur) * 0.11;
-      cur += step;
+      cur += (target - cur) * 0.2;   // the glide feel approved earlier
       if (Math.abs(target - cur) < 0.4) { cur = target; active = false; }
       go(cur); BCE.flush();
-      // a glide that runs into the top or bottom carries its speed into a small bounce
-      // (sized by how far past the edge you scrolled; fires just before the glide settles)
-      if (landing && (landing > 0 ? cur <= 24 : cur >= max() - 24)) { kick(landing * 0.035); landing = 0; }
+      // a glide that runs into the top carries into a small bounce, sized by how far past it you scrolled
+      if (landing && cur <= 24) { kick(landing * 0.035); landing = 0; }
       if (active) raf = requestAnimationFrame(tick); else raf = 0;
     };
     const start = () => { if (!active) { active = true; raf = requestAnimationFrame(tick); } };
@@ -212,28 +209,27 @@
       }
       return false;
     };
-    /* Edge bounce: pushing past the top (or bottom) pulls the page with growing resistance, then a
-       spring brings it back with a small overshoot, like a phone's rubber-band scroll. Only the
-       page layers move (top bar, header, main, footer), via the `translate` property. */
+    /* Top bounce: pushing past the top pulls the page down with growing resistance, and a spring
+       always pulls it back with a small overshoot, like a phone's rubber-band scroll. Scroll input
+       adds to the stretch but never holds it, so a trackpad's momentum tail can't leave a gap.
+       Only the page layers move (top bar, header, main, footer), via the `translate` property. */
     const layers = $$('.topbar, .hdr, main, .ftr');
-    let pull = 0, vel = 0, sraf = 0, lastWheel = 0;
-    const MAXPULL = 150;
-    let landing = 0;
-    const kick = (v) => { vel = clamp(v, -14, 14); lastWheel = 0; if (!sraf) sraf = requestAnimationFrame(spring); };
+    let pull = 0, vel = 0, sraf = 0, landing = 0;
+    const MAXPULL = 120;
     const paint = () => { const v = Math.abs(pull) < 0.3 ? '' : `0 ${pull.toFixed(1)}px`; layers.forEach(l => { l.style.translate = v; }); };
-    const spring = (now) => {
-      if (now - lastWheel < 90) { sraf = requestAnimationFrame(spring); return; }   // still being pushed
+    const spring = () => {
       vel = vel * 0.63 - pull * 0.105;   // ~8px overshoot, settles in ~0.4s
       pull += vel;
       if (Math.abs(pull) < 0.3 && Math.abs(vel) < 0.3) { pull = vel = 0; paint(); sraf = 0; return; }
       paint(); sraf = requestAnimationFrame(spring);
     };
-    const stretch = (over) => {                       // over > 0: past the top, < 0: past the bottom
-      lastWheel = performance.now(); vel = 0;
-      const k = 1 - Math.min(0.92, Math.abs(pull) / MAXPULL);    // resistance grows as it stretches
-      pull = clamp(pull + over * 0.45 * k, -MAXPULL, MAXPULL);
-      paint();
-      if (!sraf) sraf = requestAnimationFrame(spring);
+    const run = () => { if (!sraf) sraf = requestAnimationFrame(spring); };
+    const kick = (v) => { vel = clamp(v, 0, 14); run(); };
+    const stretch = (over) => {
+      const k = 1 - Math.min(0.94, Math.max(0, pull) / MAXPULL);   // resistance grows as it stretches
+      pull = Math.min(MAXPULL, pull + over * 0.4 * k);
+      vel = Math.max(vel, 0);
+      paint(); run();
     };
     addEventListener('wheel', (e) => {
       if (e.ctrlKey || e.defaultPrevented || covered() || d.body.classList.contains('menu-open')) return;
@@ -243,8 +239,7 @@
       const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1);
       const want = target + dy, m = max();
       if (want < 0 && scrollY <= 1) { stretch(-want); target = 0; return; }
-      if (want > m && scrollY >= m - 1) { stretch(m - want); target = m; return; }
-      landing = want < 0 ? Math.min(-want, 400) : want > m ? -Math.min(want - m, 400) : 0;   // glide will hit an edge
+      landing = want < 0 ? Math.min(-want, 400) : 0;   // the glide will hit the top
       target = clamp(want, 0, m);
       start();
     }, { passive: false });
@@ -356,22 +351,114 @@
       if (hdr && t !== tucked) { tucked = t; hdr.classList.toggle('is-tucked', t); }
     });
 
-    // Word bands: a compositor animation that speeds up while you scroll (no per-frame style writes)
-    const bands = $$('.marquee__track').map(row => ({ row, anim: null, rate: 1 }));
-    let vel = 0, ly = scrollY;
+    // Word bands: a compositor animation that speeds up while you scroll, and the big band leans
+    // into the direction of travel (no per-frame layout, one transform per band)
+    const bands = $$('.marquee__track').map(row => ({ row, band: row.parentElement, anim: null, rate: 1, skew: '' }));
+    let vel = 0, sv = 0, ly = scrollY, lt = 0;
     BCE.onFrame((y) => {
-      vel += (Math.min(Math.abs(y - ly), 160) * 0.05 - vel) * 0.2; ly = y;
+      const now = performance.now();
+      if (now - lt < 10) return;                // the loop can run twice in one frame; measure speed once
+      const dy = (y - ly) * Math.min(3, 16.7 / Math.max(1, now - lt)); ly = y; lt = now;
+      vel += (Math.min(Math.abs(dy), 160) * 0.05 - vel) * 0.2;
+      sv += (clamp(dy, -120, 120) * 0.14 - sv) * 0.22;
       bands.forEach((b) => {
         if (!b.anim) b.anim = b.row.getAnimations ? b.row.getAnimations()[0] : null;
-        if (!b.anim) return;
-        const r = Math.round((1 + vel) * 20) / 20;
-        if (r !== b.rate) { b.rate = r; b.anim.playbackRate = r; }
+        if (b.anim) { const r = Math.round((1 + vel) * 20) / 20; if (r !== b.rate) { b.rate = r; b.anim.playbackRate = r; } }
+        if (b.band.classList.contains('marquee--big')) {
+          const k = (Math.round(clamp(-sv, -9, 9) * 10) / 10);
+          const v = Math.abs(k) < 0.2 ? '' : `skewX(${k}deg)`;
+          if (v !== b.skew) { b.skew = v; b.band.style.transform = v; }
+        }
       });
-      if (vel > 0.05) BCE.request();        // keep easing back to cruising speed after scrolling stops
+      if (vel > 0.05 || Math.abs(sv) > 0.05) BCE.request();   // keep easing back after scrolling stops
     });
+
+    // Reading progress along the top edge
+    const bar = $('.progress i');
+    if (bar) {
+      let maxY = 1, last = -1;
+      BCE.onMeasure(() => { maxY = Math.max(1, root.scrollHeight - innerHeight); });
+      BCE.onFrame((y) => { const p = Math.round(clamp(y / maxY, 0, 1) * 1000) / 1000; if (p !== last) { last = p; bar.style.transform = `scaleX(${p})`; } });
+    }
+
+    // Hero copy lifts away and fades as you scroll past, so the next section takes over
+    const heroIn = $('.hero .hero__in');
+    if (heroIn) {
+      let hh = 1, last = -1;
+      BCE.onMeasure(() => { hh = heroIn.closest('.hero').offsetHeight; });
+      BCE.onFrame((y) => {
+        const p = Math.round(clamp(y / hh, 0, 1) * 200) / 200;
+        if (p === last) return; last = p;
+        heroIn.style.translate = p ? `0 ${(-p * 90).toFixed(1)}px` : '';
+        heroIn.style.opacity = p ? (1 - p * 0.85).toFixed(3) : '';
+      });
+    }
 
     BCE.measure();
   }
+
+  /* ---------- Safety net for slow devices ----------
+     Time ~60 frames once the page is showing. If the device can't hold ~45fps, switch the purely
+     decorative loops (aurora, sun rays, text sheen) to still images via html.lite. */
+  whenUncovered(() => setTimeout(() => {
+    const ts = []; let prev = 0;
+    const sample = (t) => {
+      if (prev) ts.push(t - prev); prev = t;
+      if (ts.length < 60) return requestAnimationFrame(sample);
+      ts.sort((a, b) => a - b);
+      const med = ts[30], slow = ts.filter(x => x > 34).length;
+      if (med > 22 || slow > 12) root.classList.add('lite');
+    };
+    if (!d.hidden) requestAnimationFrame(sample);
+  }, 600));
+
+  /* ---------- Cursor ring (mouse only) ---------- */
+  if (fine) {
+    const ring = d.createElement('div'); ring.className = 'cur'; ring.setAttribute('aria-hidden', 'true'); ring.innerHTML = '<span>View</span>';
+    d.body.appendChild(ring);
+    let mx = 0, my = 0, rx = 0, ry = 0, raf = 0, shown = false;
+    const tick = () => {
+      rx += (mx - rx) * 0.22; ry += (my - ry) * 0.22;
+      ring.style.transform = `translate3d(${rx.toFixed(1)}px, ${ry.toFixed(1)}px, 0)`;
+      raf = Math.abs(mx - rx) + Math.abs(my - ry) > 0.4 ? requestAnimationFrame(tick) : 0;
+    };
+    addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      mx = e.clientX; my = e.clientY;
+      if (!shown) { shown = true; rx = mx; ry = my; ring.classList.add('on'); }
+      if (!raf) raf = requestAnimationFrame(tick);
+    }, { passive: true });
+    d.addEventListener('pointerover', (e) => {
+      const t = e.target.closest ? e.target : null; if (!t) return;
+      const link = t.closest('a, button, select, input, textarea, label, summary, .hot, [role="tab"]');
+      const img = !link && t.closest('.mosaic figure, .gallery li');
+      ring.classList.toggle('is-link', !!link); ring.classList.toggle('is-img', !!img);
+    });
+    root.addEventListener('pointerleave', () => { shown = false; ring.classList.remove('on'); });
+    addEventListener('pointerdown', () => ring.classList.add('is-down'));
+    addEventListener('pointerup', () => ring.classList.remove('is-down'));
+  }
+
+  /* ---------- Cards tilt toward the cursor ---------- */
+  if (fine) $$('.svc, .pillar, .feats li, .statcards li, .leader, .dark3 li, .card, .cta__facts li, .ask-card').forEach((el) => {
+    let r = null;
+    el.classList.add('tilt');
+    el.addEventListener('pointerenter', () => {
+      if (el.classList.contains('rv') && !el.classList.contains('is-in')) return;
+      r = el.getBoundingClientRect(); el.style.transition = 'transform .18s ease-out, box-shadow .4s';
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!r) return;
+      const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = `perspective(900px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 9).toFixed(2)}deg) translateY(-4px)`;
+    });
+    el.addEventListener('pointerleave', () => {
+      if (!r) return; r = null;
+      el.style.transition = 'transform .7s cubic-bezier(.16, 1, .3, 1), box-shadow .4s';
+      el.style.transform = '';
+      setTimeout(() => { if (!r) el.style.transition = ''; }, 720);
+    });
+  });
 
   /* ---------- Cards: a soft spotlight follows the pointer ---------- */
   if (fine) $$('.feats li, .svc, .pillar, .card, .cta__facts li, .calc__out, .opt, .step').forEach((c) => {
@@ -398,7 +485,13 @@
       setTimeout(() => {
         word.classList.add('is-live');
         let cx = [];
-        word.addEventListener('pointerenter', () => { cx = letters.map(l => { const r = l.getBoundingClientRect(); return r.left + r.width / 2; }); });
+        let waving = false;
+        word.addEventListener('pointerenter', () => {
+          cx = letters.map(l => { const r = l.getBoundingClientRect(); return r.left + r.width / 2; });
+          if (waving) return;                                // replay the wave of light, once per visit
+          waving = true; word.classList.toggle('wave-again');
+          setTimeout(() => { waving = false; }, 2200);
+        });
         word.addEventListener('pointermove', (e) => letters.forEach((l, i) => { l.style.translate = `0 ${(-Math.max(0, 1 - Math.abs(e.clientX - (cx[i] || 0)) / 240) * 12).toFixed(1)}%`; }));
         word.addEventListener('pointerleave', () => letters.forEach(l => { l.style.translate = ''; }));
       }, 1400);

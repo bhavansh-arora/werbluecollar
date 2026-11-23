@@ -136,6 +136,7 @@ def header(active):
         f'<a href="{href}"{" aria-current=\"page\"" if key == active else ""}>{label}</a>' for key, href, label in NAV)
     return f"""
 <a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><i></i></div>
 {ticker()}
 <header class="hdr" data-hdr>
   <div class="hdr__bar">
@@ -167,6 +168,7 @@ def cta_band(title=None, sub=None):
     return f"""
 <div class="marquee marquee--big" aria-hidden="true"><div class="marquee__track">{band}{band}</div></div>
 <section class="cta" aria-labelledby="cta-h">
+  <div class="sunrays sunrays--cta" aria-hidden="true"></div>
   <img class="cta__bg" src="assets/img/hero-coast-sm.webp" srcset="assets/img/hero-coast-sm.webp 900w, assets/img/hero-coast.webp 1800w" sizes="100vw" alt="" loading="lazy">
   <div class="cta__in">
     <p class="kicker kicker--dot">Schedule your free site check</p>
@@ -236,6 +238,7 @@ def photo_hero(h):
     facts = "".join(f'<li><p class="kicker">{k}</p><b>{v}</b></li>' for k, v in h.get("facts", []))
     return f"""<section class="hero hero--page" aria-labelledby="ph-h">
   <img class="hero__bg" src="assets/img/{img}.webp" srcset="assets/img/{img}-sm.webp 900w, assets/img/{img}.webp 1800w" sizes="100vw" alt="" fetchpriority="high" style="object-position:{h.get('pos', '50% 40%')}">
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div><div class="sunrays" aria-hidden="true"></div>
   <div class="badge" aria-hidden="true">
     <svg viewBox="0 0 200 200"><defs><path id="badge-p" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs><text><textPath href="#badge-p" textLength="458">{h.get('badge', 'FREE SITE CHECK · NO PRESSURE · GROVER BEACH ·')}</textPath></text></svg>
     <img src="assets/img/logo-mark.png" alt="">
