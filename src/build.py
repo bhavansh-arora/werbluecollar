@@ -108,7 +108,7 @@ def btn(label, href, cls="", icon="arrow-r", attrs=""):
 
 # Curtain label for each page: baked in so the arriving page's first frame already reads right
 PAGE_NAMES = {"index": "Home", "payment-options": "Ways to pay", "services": "Services", "process": "How it works",
-              "about": "About the crew", "quote": "Your free quote", "preview-pack": "Preview pack"}
+              "about": "About the crew", "quote": "Your free quote"}
 
 def covers(page=""):
     """First-visit loader (a battery charging with real page progress) and the page-change curtain."""
@@ -224,7 +224,7 @@ def footer():
     <div class="ftr__bot">
       <span>© <span data-year>2026</span> Blue Collar Energy. Power that shows up.</span>
       <span>Grover Beach, CA · <span data-clock>Pacific time</span></span>
-      <span>Concept by <a href="preview-pack.html">Code Bunny</a> · <a href="#main">Back to top ↑</a></span>
+      <span>Concept by Code Bunny · <a href="#main">Back to top ↑</a></span>
     </div>
   </div>
 </footer>
@@ -232,9 +232,6 @@ def footer():
   <a href="{TEL}">{ic('phone')}Call</a>
   <a class="q" href="quote.html">Free quote{ic('arrow-r')}</a>
 </nav>"""
-
-def concept_badge():
-    return '<a class="concept" href="preview-pack.html">Concept for Blue Collar · <b>Preview pack</b></a>'
 
 def photo_hero(h):
     """Inner-page hero: full-bleed photo, breadcrumb, headline with a serif accent, lede and buttons,
@@ -388,7 +385,7 @@ def build():
         scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site", "motion"] + meta.get("scripts", []))
         html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + covers(p.stem) + header(meta.get("nav", "")) +
                 f'\n<main id="main">\n{body}\n{cta}\n</main>' + footer() +
-                (concept_badge() if meta.get("badge", True) else "") + f"\n{scripts}\n</body>\n</html>\n")
+                f"\n{scripts}\n</body>\n</html>\n")
         (ROOT / p.name).write_text(html)
         out.append(p.name)
     print("built:", ", ".join(out))

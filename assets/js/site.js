@@ -38,14 +38,13 @@
   }
 
   /* ---------- Header: transparent over the hero, solid once you scroll ---------- */
-  const hdr = $('[data-hdr]'), mbar = $('.mbar'), concept = $('.concept');
+  const hdr = $('[data-hdr]'), mbar = $('.mbar');
   let sState = '';
   BCE.onFrame((y, vh) => {
     const s = `${y > 40}${y > 480}${y > vh * 0.85}`;
     if (s === sState) return; sState = s;
     if (hdr) hdr.classList.toggle('is-scrolled', y > 40);
     if (mbar) mbar.classList.toggle('on', y > 480);
-    if (concept) concept.classList.toggle('on', y > vh * 0.85);
   });
 
   /* ---------- Mobile menu ---------- */

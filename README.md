@@ -11,7 +11,6 @@ A static multi-page site. No framework and no build tooling are needed to host i
 | `process.html` | Four-step scroll timeline with "You / Blue Collar" responsibilities, plus the three promises |
 | `about.html` | Story, leadership, promises, service area and office |
 | `quote.html` | 5-step adaptive quote flow with live estimate, plus contact details |
-| `preview-pack.html` | Pitch page for David: what works, where quotes slip, what we built, next steps |
 
 ## Editing
 - Pages are composed from `src/pages/*.html` plus shared header, footer and CTA in `src/build.py`.

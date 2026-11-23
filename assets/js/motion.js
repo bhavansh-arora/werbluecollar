@@ -21,7 +21,7 @@
   const whenUncovered = (fn) => { if (covered()) waiting.push(fn); else fn(); };
   const uncover = () => { root.classList.remove('is-loading', 'pt-in'); while (waiting.length) waiting.shift()(); };
   const NAMES = { 'index.html': 'Home', '': 'Home', 'payment-options.html': 'Ways to pay', 'services.html': 'Services',
-    'process.html': 'How it works', 'about.html': 'About the crew', 'quote.html': 'Your free quote', 'preview-pack.html': 'Preview pack' };
+    'process.html': 'How it works', 'about.html': 'About the crew', 'quote.html': 'Your free quote' };
   const nameFor = (url) => NAMES[url.pathname.split('/').pop()] || 'Blue Collar';
 
   // First visit: the battery charges with real page progress (images + fonts), 1.4s to 3s.
