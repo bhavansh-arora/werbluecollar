@@ -193,12 +193,17 @@
     const go = (y) => { scrollTo({ top: y, behavior: 'instant' }); };
     const tick = () => {
       cur += (target - cur) * 0.11;
+      const step = (target - cur) * 0.11;
+      cur += step;
       if (Math.abs(target - cur) < 0.4) { cur = target; active = false; }
       go(cur); BCE.flush();
+      // a glide that runs into the top or bottom carries its speed into a small bounce
+      // (sized by how far past the edge you scrolled; fires just before the glide settles)
+      if (landing && (landing > 0 ? cur <= 24 : cur >= max() - 24)) { kick(landing * 0.035); landing = 0; }
       if (active) raf = requestAnimationFrame(tick); else raf = 0;
     };
     const start = () => { if (!active) { active = true; raf = requestAnimationFrame(tick); } };
-    const stop = () => { if (active) { active = false; cancelAnimationFrame(raf); } target = cur = scrollY; };
+    const stop = () => { if (active) { active = false; cancelAnimationFrame(raf); } target = cur = scrollY; landing = 0; };
     const canScroll = (el, dy) => {
       for (; el && el !== d.body && el !== root; el = el.parentElement) {
         if (el.scrollHeight <= el.clientHeight + 1) continue;
@@ -207,13 +212,40 @@
       }
       return false;
     };
+    /* Edge bounce: pushing past the top (or bottom) pulls the page with growing resistance, then a
+       spring brings it back with a small overshoot, like a phone's rubber-band scroll. Only the
+       page layers move (top bar, header, main, footer), via the `translate` property. */
+    const layers = $$('.topbar, .hdr, main, .ftr');
+    let pull = 0, vel = 0, sraf = 0, lastWheel = 0;
+    const MAXPULL = 150;
+    let landing = 0;
+    const kick = (v) => { vel = clamp(v, -14, 14); lastWheel = 0; if (!sraf) sraf = requestAnimationFrame(spring); };
+    const paint = () => { const v = Math.abs(pull) < 0.3 ? '' : `0 ${pull.toFixed(1)}px`; layers.forEach(l => { l.style.translate = v; }); };
+    const spring = (now) => {
+      if (now - lastWheel < 90) { sraf = requestAnimationFrame(spring); return; }   // still being pushed
+      vel = vel * 0.63 - pull * 0.105;   // ~8px overshoot, settles in ~0.4s
+      pull += vel;
+      if (Math.abs(pull) < 0.3 && Math.abs(vel) < 0.3) { pull = vel = 0; paint(); sraf = 0; return; }
+      paint(); sraf = requestAnimationFrame(spring);
+    };
+    const stretch = (over) => {                       // over > 0: past the top, < 0: past the bottom
+      lastWheel = performance.now(); vel = 0;
+      const k = 1 - Math.min(0.92, Math.abs(pull) / MAXPULL);    // resistance grows as it stretches
+      pull = clamp(pull + over * 0.45 * k, -MAXPULL, MAXPULL);
+      paint();
+      if (!sraf) sraf = requestAnimationFrame(spring);
+    };
     addEventListener('wheel', (e) => {
       if (e.ctrlKey || e.defaultPrevented || covered() || d.body.classList.contains('menu-open')) return;
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || canScroll(e.target, e.deltaY)) return;
       e.preventDefault();
       if (!active) target = cur = scrollY;
       const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1);
-      target = clamp(target + dy, 0, max());
+      const want = target + dy, m = max();
+      if (want < 0 && scrollY <= 1) { stretch(-want); target = 0; return; }
+      if (want > m && scrollY >= m - 1) { stretch(m - want); target = m; return; }
+      landing = want < 0 ? Math.min(-want, 400) : want > m ? -Math.min(want - m, 400) : 0;   // glide will hit an edge
+      target = clamp(want, 0, m);
       start();
     }, { passive: false });
     addEventListener('pointerdown', stop);
