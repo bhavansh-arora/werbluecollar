@@ -25,27 +25,19 @@ A static multi-page site. No framework and no build tooling are needed to host i
 - Shared blocks (map, town list, bill slider, CTA, footer) are partials in `src/build.py`.
 
 ## 3D and motion
-- **Hero scene** (`assets/js/hero3d.js`, Three.js r169 vendored in `assets/js/vendor/`, MIT): a procedural
-  Central Coast home with the 4.0 kW / 10-panel array the $220 calculator default sizes. No model files.
-  It shows `assets/img/hero-3d.webp` (a render of the same scene) until the first frame is drawn, pauses
-  off screen, and draws one still frame for reduced-motion users. Hover a panel to inspect it.
-- **Regenerating the poster** after changing the scene: open `index.html#poster` over http (the `#poster`
-  hash freezes the scene at t=0), screenshot `.hero__scene` at 1440x900 @1.25x, save as
-  `hero-3d.webp` (1800w) and `hero-3d-sm.webp` (900w).
-- **Exploded panel**, **3D map**, **tilt cards** and **scroll depth** are CSS 3D plus a little JS in `site.js`.
-  Scroll-linked effects use CSS scroll timelines (Chrome, Edge, Safari 26+); other browsers show them still.
-- The rule throughout: motion decorates, it never hides content. Nothing starts invisible.
+- **The panel** (`assets/js/panel3d.js`): one photoreal solar panel modelled in code (bevelled aluminum
+  frame, transmissive glass, encapsulant, 120 half-cut mono cells, backsheet, junction box), lit by
+  studio softboxes with bloom. It sits in the hero; the "Seven parts. No mystery." section pins it and
+  takes it apart layer by layer as you scroll, with labels that track each layer.
+  Three.js r169 is vendored in `assets/js/vendor/` (MIT) and loaded through an import map.
+- **Motion** (`assets/js/motion.js`): GSAP 3.13 + ScrollTrigger + SplitText (free standard licence) and
+  Lenis smooth scrolling, all vendored. Headlines rise line by line just before they reach the screen;
+  body copy, numbers and buttons are never hidden. The hero intro is under a second, and a 2.5s
+  safety net in `<head>` shows it even if scripts fail.
+- **Loading**: a poster render of the panel (`assets/img/hero-panel*.webp`) shows until the first
+  WebGL frame; rendering pauses whenever the stage is off screen; phones get a lighter render path.
+  Reduced-motion users get no smooth scroll, reveals or idle drift.
+- **Regenerating the poster** after changing the scene: open `index.html#poster` over http (the hash
+  freezes the pose), wait ~3s, screenshot `.stage__sticky` at 1440x900 @1.25x and save it as
+  `hero-panel.webp` (1800w) and `hero-panel-sm.webp` (900w).
 - ES modules don't run from `file://`; preview with any static server (e.g. `python3 -m http.server`).
-- **Calculator assumptions** live in one object, `ASSUME`, at the top of `assets/js/calc.js`
-  (utility rate, $/W, loan APR/term, PPA rate and escalator, production, net-billing value).
-  The text explaining the assumptions on the page updates automatically.
-
-## Going live: connect the quote form
-Set `data-endpoint` on the form in `src/pages/quote.html` to a Formspree, Netlify Forms, HubSpot or CRM webhook URL, then rebuild.
-The form POSTs JSON: project type, bill, ownership, roof age, payment preference, contact details, source page and UTM tags.
-With no endpoint set, it runs in demo mode: it shows the thank-you screen but sends nothing.
-
-## Before launch
-- Replace the calculator placeholders with Blue Collar's real pricing, lender terms and PPA partner rates.
-- Add real Google reviews (none were invented for the concept).
-- Check the leadership photos: `david.webp` and `christian.webp` keep the file names used on the current site.

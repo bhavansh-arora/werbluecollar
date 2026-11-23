@@ -69,6 +69,9 @@ def sprite():
         for k, v in ICONS.items())
     return f'<svg width="0" height="0" style="position:absolute" aria-hidden="true">{syms}</svg>'
 
+IMPORTMAP = """
+<script type="importmap">{"imports": {"three": "./assets/js/vendor/three.module.min.js", "three/addons/": "./assets/js/vendor/three-addons/"}}</script>"""
+
 def head(meta):
     title = meta["title"]
     return f"""<!doctype html>
@@ -84,10 +87,9 @@ def head(meta):
 <meta property="og:image" content="assets/img/hero-coast.webp">
 <meta property="og:type" content="website">
 <link rel="icon" href="assets/img/logo-mark.png">
-<link rel="preload" href="assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/barlow-sc-700.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/site.css">{''.join(f'\n<link rel="modulepreload" href="assets/js/{m}">' for m in meta.get("modulepreload", []))}
+<script>document.documentElement.classList.add('js');setTimeout(function(){{document.documentElement.classList.add('ready')}},2500)</script>
+<link rel="preload" href="assets/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/site.css">{IMPORTMAP if meta.get("importmap") else ""}{''.join(f'\n<link rel="modulepreload" href="assets/js/{m}">' for m in meta.get("modulepreload", []))}
 <script type="application/ld+json">{json.dumps({
     "@context": "https://schema.org", "@type": "HomeAndConstructionBusiness",
     "name": "Blue Collar Energy", "telephone": "+1-805-441-0939", "email": EMAIL,
@@ -135,16 +137,14 @@ def cta_band(title=None, sub=None):
     return f"""
 <section class="cta" aria-labelledby="cta-h">
   <div class="wrap cta__inner">
-    <div class="cta__text">
-      <h2 class="d-l" id="cta-h">{title}</h2>
+    <p class="eyebrow">Free site check · No obligation</p>
+    <h2 class="d-cta" id="cta-h" data-split>{title}</h2>
+    <div class="cta__row">
       <p>{sub}</p>
-    </div>
-    <div class="cta__side">
       <div class="btns">
-        <a class="btn" href="quote.html">Start my free quote{ic('arrow-r')}</a>
-        <a class="btn btn--ghost" href="{TEL}">{ic('phone')}Call {PHONE}</a>
+        <a class="btn btn--volt btn--lg" href="quote.html" data-magnetic>Start my free quote{ic('arrow-r')}</a>
+        <a class="btn btn--ghost btn--lg" href="{TEL}">{ic('phone')}{PHONE}</a>
       </div>
-      <p class="cta__contact"><a href="mailto:{EMAIL}">{EMAIL}</a> · Reply within one business day</p>
     </div>
   </div>
 </section>"""
@@ -243,7 +243,8 @@ def build():
             body = body.replace(k, v)
         body = body.replace("{{bill}}", BILL.replace("{id}", p.stem)).replace("{{PHONE}}", PHONE).replace("{{TEL}}", TEL).replace("{{EMAIL}}", EMAIL).replace("{{ADDR}}", ADDR)
         cta = cta_band(meta.get("cta_title"), meta.get("cta_sub")) if meta.get("cta", True) else ""
-        scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site"] + meta.get("scripts", []))
+        motion = ["vendor/gsap.min", "vendor/ScrollTrigger.min", "vendor/SplitText.min", "vendor/lenis.min"]
+        scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in motion + ["site", "motion"] + meta.get("scripts", []))
         scripts += "".join(f'<script type="module" src="assets/js/{s}.js"></script>' for s in meta.get("modules", []))
         html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + header(meta.get("nav", "")) +
                 f'\n<main id="main">\n{body}\n{cta}\n</main>' + footer() +

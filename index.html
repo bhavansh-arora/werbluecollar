@@ -11,12 +11,12 @@
 <meta property="og:image" content="assets/img/hero-coast.webp">
 <meta property="og:type" content="website">
 <link rel="icon" href="assets/img/logo-mark.png">
-<link rel="preload" href="assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/barlow-sc-700.woff2" as="font" type="font/woff2" crossorigin>
+<script>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('ready')},2500)</script>
+<link rel="preload" href="assets/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/site.css">
+<script type="importmap">{"imports": {"three": "./assets/js/vendor/three.module.min.js", "three/addons/": "./assets/js/vendor/three-addons/"}}</script>
 <link rel="modulepreload" href="assets/js/vendor/three.module.min.js">
-<link rel="modulepreload" href="assets/js/hero3d.js">
+<link rel="modulepreload" href="assets/js/panel3d.js">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "HomeAndConstructionBusiness", "name": "Blue Collar Energy", "telephone": "+1-805-441-0939", "email": "info@werbluecollar.com", "address": {"@type": "PostalAddress", "streetAddress": "1198 Farroll Rd, Suite 4", "addressLocality": "Grover Beach", "addressRegion": "CA", "postalCode": "93433", "addressCountry": "US"}, "areaServed": ["Grover Beach", "Pismo Beach", "Arroyo Grande", "San Luis Obispo", "Santa Maria"], "url": "https://www.werbluecollar.com/"}</script>
 </head>
 <body class="">
@@ -46,49 +46,65 @@
   </div>
 </div>
 <main id="main">
-<!-- ============ HERO ============ -->
-<section class="hero" aria-labelledby="hero-h">
-  <div class="hero__scene" data-hero3d>
-    <img decoding="async" class="hero__poster" src="assets/img/hero-3d.webp" srcset="assets/img/hero-3d-sm.webp 900w, assets/img/hero-3d.webp 1800w" sizes="100vw" alt="3D model of a Central Coast home with ten solar panels on the roof at golden hour" fetchpriority="high">
-    <canvas aria-hidden="true"></canvas>
+<!-- ============ STAGE: the 3D panel stays put while the hero and the story scroll over it ============ -->
+<div class="stage" data-stage>
+  <div class="stage__sticky" aria-hidden="true">
+    <img decoding="async" class="stage__poster" src="assets/img/hero-panel.webp" srcset="assets/img/hero-panel-sm.webp 900w, assets/img/hero-panel.webp 1800w" sizes="100vw" alt="" fetchpriority="high">
+    <canvas></canvas>
+    <div class="stage__tags">
+      <span class="tag3d" data-tag>Aluminum frame</span>
+      <span class="tag3d" data-tag>Tempered glass</span>
+      <span class="tag3d" data-tag>Encapsulant</span>
+      <span class="tag3d" data-tag>Solar cells</span>
+      <span class="tag3d" data-tag>Encapsulant</span>
+      <span class="tag3d" data-tag>Backsheet</span>
+      <span class="tag3d" data-tag>Junction box</span>
+    </div>
   </div>
-  <div class="hero__tip" data-hero3d-tip hidden></div>
 
-  <div class="wrap hero__grid">
-    <div class="hero__text">
-      <p class="eyebrow">Solar installer · Grover Beach, California</p>
-      <h1 class="d-xxl" id="hero-h">Solar installed by a crew that <em>shows up.</em></h1>
-      <p class="lede">We design, permit and install solar for Central Coast homes and businesses. Buy it, finance it, or pay only for the power. You see real numbers for all three before you decide.</p>
-      <div class="btns">
-        <a class="btn btn--volt" href="quote.html">Get my free quote<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="wrap hero__in">
+      <p class="eyebrow" data-fade>Solar installer · Grover Beach, California</p>
+      <h1 class="d-hero" id="hero-h" data-split="hero">Solar installed by a crew that <em>shows&nbsp;up.</em></h1>
+      <p class="lede" data-fade>We design, permit and install solar for Central Coast homes and businesses. Buy it, finance it, or pay only for the power. You see real numbers for all three before you decide.</p>
+      <div class="btns" data-fade>
+        <a class="btn btn--volt" href="quote.html" data-magnetic>Get my free quote<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
         <a class="btn btn--ghost" href="#compare">Compare the 3 ways to pay</a>
       </div>
     </div>
-
-    <aside class="hud" aria-label="About the 3D model">
-      <p class="hud__k">The model on screen</p>
-      <dl>
-        <div><dt>System</dt><dd>4.0 kW · 10 panels</dd></div>
-        <div><dt>Producing</dt><dd data-hero3d-kw>3.37 kW</dd></div>
-        <div><dt>Battery</dt><dd data-hero3d-bat>62%</dd></div>
-      </dl>
-      <p class="hud__hint"><svg aria-hidden="true"><use href="#i-sun"/></svg>Golden hour, illustrative. Hover a panel to inspect it.</p>
-    </aside>
-  </div>
-
-  <div class="dock" data-picker>
-    <div class="wrap dock__in">
-      <h2 class="dock__h">What are we powering?</h2>
-      <div class="dock__opts" role="group" aria-label="Project type">
-        <button type="button" data-type="home" aria-pressed="true"><svg aria-hidden="true"><use href="#i-home"/></svg>Home</button>
-        <button type="button" data-type="business" aria-pressed="false"><svg aria-hidden="true"><use href="#i-building"/></svg>Business</button>
-        <button type="button" data-type="battery" aria-pressed="false"><svg aria-hidden="true"><use href="#i-battery"/></svg>Battery</button>
-        <button type="button" data-type="ground" aria-pressed="false"><svg aria-hidden="true"><use href="#i-ground"/></svg>Ground mount</button>
+    <div class="dock" data-picker>
+      <div class="wrap dock__in">
+        <h2 class="dock__h">What are we powering?</h2>
+        <div class="dock__opts" role="group" aria-label="Project type">
+          <button type="button" data-type="home" aria-pressed="true"><svg aria-hidden="true"><use href="#i-home"/></svg>Home</button>
+          <button type="button" data-type="business" aria-pressed="false"><svg aria-hidden="true"><use href="#i-building"/></svg>Business</button>
+          <button type="button" data-type="battery" aria-pressed="false"><svg aria-hidden="true"><use href="#i-battery"/></svg>Battery</button>
+          <button type="button" data-type="ground" aria-pressed="false"><svg aria-hidden="true"><use href="#i-ground"/></svg>Ground mount</button>
+        </div>
+        <a class="btn btn--light" href="quote.html?type=home" data-picker-go>Start my quote<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
       </div>
-      <a class="btn btn--light" href="quote.html?type=home" data-picker-go>Start my quote, about 60 seconds<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
     </div>
-  </div>
-</section>
+  </section>
+
+  <section class="inside" id="inside" aria-labelledby="story-h">
+    <div class="inside__pin">
+      <div class="wrap inside__in">
+        <p class="eyebrow">What goes on your roof</p>
+        <h2 class="d-l" id="story-h" data-split>Seven parts. No&nbsp;mystery.</h2>
+        <p class="inside__lede">A solar panel is a well-built sandwich, not magic. Scroll and we'll take one apart.</p>
+        <ol class="inside__list">
+          <li data-step data-n="01"><b>Aluminum frame</b><span>Keeps it square and bolts to the racking.</span></li>
+          <li data-step data-n="02"><b>Tempered glass</b><span>Lets the light in, keeps hail and weather out.</span></li>
+          <li data-step data-n="03"><b>Encapsulant</b><span>Seals the cells in and cushions them.</span></li>
+          <li data-step data-n="04"><b>Solar cells</b><span>Silicon that turns sunlight into DC power.</span></li>
+          <li data-step data-n="05"><b>Encapsulant</b><span>A second seal under the cells.</span></li>
+          <li data-step data-n="06"><b>Backsheet</b><span>Insulates and protects the back.</span></li>
+          <li data-step data-n="07"><b>Junction box</b><span>Where the panel's wiring joins your system.</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</div>
 
 <!-- ============ FACTS ============ -->
 <div class="facts">
@@ -128,23 +144,27 @@
       </div>
       <a class="link-u" href="services.html">All services<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
     </div>
-    <ul class="jobs">
-      <li><a class="job" data-tilt="6" href="services.html#homes">
-        <span class="job__img"><img decoding="async" src="assets/img/home-hills-sm.webp" alt="Single-storey home with a roof-mounted solar array below golden hills"></span>
-        <span class="job__t">Homes<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
-        <span class="job__d">Roof-mounted systems sized to your roof, your shade and a year of your bills.</span></a></li>
-      <li><a class="job" data-tilt="6" href="services.html#business">
-        <span class="job__img"><img decoding="async" src="assets/img/commercial-sm.webp" alt="Commercial flat-roof solar array overlooking the coast"></span>
-        <span class="job__t">Businesses<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
-        <span class="job__d">Commercial and flat-roof systems, with the permits and utility paperwork handled.</span></a></li>
-      <li><a class="job" data-tilt="6" href="services.html#battery">
-        <span class="job__img"><img decoding="async" src="assets/img/battery-sm.webp" alt="Home battery mounted on a garage wall"></span>
-        <span class="job__t">Battery storage<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
-        <span class="job__d">Stores daytime solar for the evening and keeps essentials running in an outage.</span></a></li>
-      <li><a class="job" data-tilt="6" href="services.html#ground">
-        <span class="job__img"><img decoding="async" src="assets/img/vineyard-sm.webp" alt="Ground-mounted solar array beside a hillside vineyard"></span>
-        <span class="job__t">Ground mounts<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
-        <span class="job__d">Arrays for ranches, vineyards and properties where the roof isn't the best spot.</span></a></li>
+    <ul class="svlist" data-svlist>
+      <li><a href="services.html#homes" data-img="assets/img/home-hills-sm.webp">
+        <span class="svlist__t">Homes</span>
+        <span class="svlist__d">Roof-mounted systems sized to your roof, your shade and a year of your bills.</span>
+        <span class="svlist__go"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+        <img decoding="async" class="svlist__thumb" src="assets/img/home-hills-sm.webp" alt="" loading="lazy"></a></li>
+      <li><a href="services.html#business" data-img="assets/img/commercial-sm.webp">
+        <span class="svlist__t">Businesses</span>
+        <span class="svlist__d">Commercial and flat-roof systems, with the permits and utility paperwork handled.</span>
+        <span class="svlist__go"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+        <img decoding="async" class="svlist__thumb" src="assets/img/commercial-sm.webp" alt="" loading="lazy"></a></li>
+      <li><a href="services.html#battery" data-img="assets/img/battery-sm.webp">
+        <span class="svlist__t">Battery storage</span>
+        <span class="svlist__d">Stores daytime solar for the evening and keeps essentials running in an outage.</span>
+        <span class="svlist__go"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+        <img decoding="async" class="svlist__thumb" src="assets/img/battery-sm.webp" alt="" loading="lazy"></a></li>
+      <li><a href="services.html#ground" data-img="assets/img/vineyard-sm.webp">
+        <span class="svlist__t">Ground mounts</span>
+        <span class="svlist__d">Arrays for ranches, vineyards and properties where the roof isn't the best spot.</span>
+        <span class="svlist__go"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+        <img decoding="async" class="svlist__thumb" src="assets/img/vineyard-sm.webp" alt="" loading="lazy"></a></li>
     </ul>
   </div>
 </section>
@@ -233,43 +253,11 @@
       <a class="link-u" href="process.html">The full process, step by step<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
     </div>
     <ol class="steps">
-      <li class="step"><span class="step__n">1</span><h3>Site check</h3><p class="step__k">Free · no obligation</p><p>We look at your roof, your shade and a year of bills.</p></li>
-      <li class="step"><span class="step__n">2</span><h3>Design &amp; proposal</h3><p class="step__k">Three prices</p><p>A system sized to how you actually use power, with purchase, finance and PPA numbers side by side.</p></li>
-      <li class="step"><span class="step__n">3</span><h3>Permits &amp; install</h3><p class="step__k">We do the paperwork</p><p>We handle the permits and the utility paperwork, then install on a scheduled day.</p></li>
-      <li class="step"><span class="step__n">4</span><h3>Power on</h3><p class="step__k">Watch it work</p><p>Inspection, interconnection, and a system you can watch producing from your phone.</p></li>
+      <li class="step"><span class="step__n">01</span><h3>Site check</h3><p class="step__k">Free · no obligation</p><p>We look at your roof, your shade and a year of bills.</p></li>
+      <li class="step"><span class="step__n">02</span><h3>Design &amp; proposal</h3><p class="step__k">Three prices</p><p>A system sized to how you actually use power, with purchase, finance and PPA numbers side by side.</p></li>
+      <li class="step"><span class="step__n">03</span><h3>Permits &amp; install</h3><p class="step__k">We do the paperwork</p><p>We handle the permits and the utility paperwork, then install on a scheduled day.</p></li>
+      <li class="step"><span class="step__n">04</span><h3>Power on</h3><p class="step__k">Watch it work</p><p>Inspection, interconnection, and a system you can watch producing from your phone.</p></li>
     </ol>
-  </div>
-</section>
-
-<!-- ============ INSIDE A PANEL (CSS 3D, separates as you scroll) ============ -->
-<section class="sec sec--ink layers-sec" aria-labelledby="layers-h">
-  <div class="wrap layers" data-layers>
-    <div class="layers__text">
-      <p class="eyebrow">What goes on your roof</p>
-      <h2 class="d-l" id="layers-h">Seven parts. No mystery.</h2>
-      <p class="lede">A solar panel is a well-built sandwich, not magic. Here is every layer, so you know exactly what you're paying for and what we're bolting to your roof.</p>
-      <ol class="layers__list">
-        <li data-layer="6"><span class="layers__sw layers__sw--frame"></span><b>Aluminum frame</b><span>Keeps it square and bolts to the racking.</span></li>
-        <li data-layer="5"><span class="layers__sw layers__sw--glass"></span><b>Tempered glass</b><span>Lets the light in, keeps hail and weather out.</span></li>
-        <li data-layer="4"><span class="layers__sw layers__sw--eva"></span><b>Encapsulant</b><span>Seals the cells in and cushions them.</span></li>
-        <li data-layer="3"><span class="layers__sw layers__sw--cells"></span><b>Solar cells</b><span>Silicon that turns sunlight into DC power.</span></li>
-        <li data-layer="2"><span class="layers__sw layers__sw--eva"></span><b>Encapsulant</b><span>A second seal under the cells.</span></li>
-        <li data-layer="1"><span class="layers__sw layers__sw--back"></span><b>Backsheet</b><span>Insulates and protects the back of the panel.</span></li>
-        <li data-layer="0"><span class="layers__sw layers__sw--jb"></span><b>Junction box</b><span>Where the panel's wiring joins your system.</span></li>
-      </ol>
-    </div>
-    <div class="panel3d" data-tilt="10" aria-hidden="true">
-      <div class="panel3d__stack">
-        <i class="pl pl--jb" style="--i:0"></i>
-        <i class="pl pl--back" style="--i:1"></i>
-        <i class="pl pl--eva" style="--i:2"></i>
-        <i class="pl pl--cells" style="--i:3"></i>
-        <i class="pl pl--eva" style="--i:4"></i>
-        <i class="pl pl--glass" style="--i:5"></i>
-        <i class="pl pl--frame" style="--i:6"></i>
-      </div>
-      <span class="panel3d__shadow"></span>
-    </div>
   </div>
 </section>
 
@@ -277,7 +265,7 @@
 <section class="sec sec--paper2" aria-labelledby="who-h">
   <div class="wrap">
     <div class="crew">
-      <figure class="crew__photo" data-tilt="4">
+      <figure class="crew__photo" data-open>
         <img decoding="async" src="assets/img/team-sm.webp" srcset="assets/img/team-sm.webp 900w, assets/img/team.webp 1800w" sizes="(min-width:1000px) 58vw, 100vw" alt="The Blue Collar Energy crew standing in front of the company sign" loading="lazy">
       </figure>
       <div class="crew__text">
@@ -334,16 +322,14 @@
 
 <section class="cta" aria-labelledby="cta-h">
   <div class="wrap cta__inner">
-    <div class="cta__text">
-      <h2 class="d-l" id="cta-h">Ready to see what your roof can do?</h2>
+    <p class="eyebrow">Free site check · No obligation</p>
+    <h2 class="d-cta" id="cta-h" data-split>Ready to see what your roof can do?</h2>
+    <div class="cta__row">
       <p>A free site check, three prices on paper, and no pressure either way. We come back with real numbers for buying, financing or a PPA.</p>
-    </div>
-    <div class="cta__side">
       <div class="btns">
-        <a class="btn" href="quote.html">Start my free quote<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
-        <a class="btn btn--ghost" href="tel:+18054410939"><svg aria-hidden="true"><use href="#i-phone"/></svg>Call (805) 441-0939</a>
+        <a class="btn btn--volt btn--lg" href="quote.html" data-magnetic>Start my free quote<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
+        <a class="btn btn--ghost btn--lg" href="tel:+18054410939"><svg aria-hidden="true"><use href="#i-phone"/></svg>(805) 441-0939</a>
       </div>
-      <p class="cta__contact"><a href="mailto:info@werbluecollar.com">info@werbluecollar.com</a> · Reply within one business day</p>
     </div>
   </div>
 </section>
@@ -382,6 +368,6 @@
   <a href="tel:+18054410939"><svg aria-hidden="true"><use href="#i-phone"/></svg>Call</a>
   <a class="q" href="quote.html">Free quote<svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
 </nav><a class="concept" href="preview-pack.html">Concept for Blue Collar · <b>Preview pack</b></a>
-<script src="assets/js/site.js" defer></script><script src="assets/js/calc.js" defer></script><script type="module" src="assets/js/hero3d.js"></script>
+<script src="assets/js/vendor/gsap.min.js" defer></script><script src="assets/js/vendor/ScrollTrigger.min.js" defer></script><script src="assets/js/vendor/SplitText.min.js" defer></script><script src="assets/js/vendor/lenis.min.js" defer></script><script src="assets/js/site.js" defer></script><script src="assets/js/motion.js" defer></script><script src="assets/js/calc.js" defer></script><script type="module" src="assets/js/panel3d.js"></script>
 </body>
 </html>
