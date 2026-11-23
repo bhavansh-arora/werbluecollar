@@ -37,6 +37,11 @@ A static multi-page site. No framework and no build tooling are needed to host i
     the "why" statement lights up as you scroll, photos drift (parallax), process cards stack,
     the big word band speeds up with scrolling, a spotlight follows the cursor on cards, primary buttons
     are magnetic, and the footer wordmark letters rise and lift near the cursor.
+  - Smoothness: `window.BCE` in `site.js` is the one frame loop for every scroll effect. Geometry is
+    cached in `onMeasure` (load, resize, content size changes) and `onFrame` only does arithmetic and
+    style writes, so scrolling never forces layout. Mouse-wheel scrolling is eased (no library; touch,
+    keyboard and scrollbar stay native); big sections rise and settle as they arrive; decorative loops
+    pause off screen (`.is-off`); internal pages are prefetched on hover.
   - Rule: content that is already on screen is never hidden; entrances only apply below the fold or
     behind a cover. Reduced-motion users get none of it.
 - Inner pages: each starts with `<!--HERO {json}-->` (photo, title, lede, buttons, facts), rendered by

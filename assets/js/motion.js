@@ -66,7 +66,7 @@
         root.classList.add('pt-leave');
         uncover();
         setTimeout(() => root.classList.remove('pt-leave'), 1200);
-      }, Math.max(0, 380 - (performance.now() - t0)));
+      }, Math.max(0, 240 - (performance.now() - t0)));
     };
     Promise.race([d.fonts ? d.fonts.ready : Promise.resolve(), new Promise(r => setTimeout(r, 700))]).then(lift);
     setTimeout(lift, 1800);
@@ -82,8 +82,19 @@
     e.preventDefault();
     if (ptName) ptName.textContent = nameFor(url);
     root.classList.add('pt-out');
-    setTimeout(() => { location.href = url.href; }, 720);
+    setTimeout(() => { location.href = url.href; }, 560);
   });
+  const fetched = new Set();
+  const prefetch = (e) => {
+    const a = e.target.closest && e.target.closest('a[href$=".html"]');
+    if (!a) return;
+    let url; try { url = new URL(a.getAttribute('href'), location.href); } catch (err) { return; }
+    if (url.origin !== location.origin || url.pathname === location.pathname || fetched.has(url.pathname)) return;
+    fetched.add(url.pathname);
+    const l = d.createElement('link'); l.rel = 'prefetch'; l.href = url.pathname; d.head.appendChild(l);
+  };
+  d.addEventListener('pointerover', prefetch, { passive: true });
+  d.addEventListener('touchstart', prefetch, { passive: true });
   addEventListener('pageshow', (e) => { if (e.persisted) root.classList.remove('pt-out', 'pt-in', 'pt-leave', 'is-loading'); });
   if (pt && !covered()) pt.classList.add('is-idle');
 
@@ -169,94 +180,166 @@
     onView(b, () => b.classList.add('is-in'), '0px 0px -15% 0px');
   });
 
-  /* ---------- One scroll loop for everything position-driven ---------- */
-  const scrollers = [];
-  let queued = false;
-  const runScroll = () => { queued = false; const vh = innerHeight; scrollers.forEach(f => f(vh)); };
-  addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(runScroll); } }, { passive: true });
-  addEventListener('resize', () => requestAnimationFrame(runScroll), { passive: true });
+  /* ---------- Scroll-driven effects, on the shared frame loop (see BCE in site.js) ----------
+     Geometry is cached in onMeasure; onFrame only does arithmetic and style writes. */
+  const BCE = window.BCE;
 
-  // Statement lights up word by word
-  $$('.statement').forEach((el) => {
-    (function split(node) {
-      [...node.childNodes].forEach((n) => {
-        if (n.nodeType === 3) {
-          const frag = d.createDocumentFragment();
-          n.textContent.split(/(\s+)/).forEach((part) => {
-            if (!part) return;
-            if (/^\s+$/.test(part)) { frag.appendChild(d.createTextNode(part)); return; }
-            const w = d.createElement('span'); w.className = 'w'; w.textContent = part; frag.appendChild(w);
-          });
-          n.replaceWith(frag);
-        } else if (n.nodeType === 1 && !n.classList.contains('pill-img')) split(n);
-      });
-    })(el);
-    el.classList.add('is-words');
-    const words = $$('.w', el);
-    let shown = -1;
-    scrollers.push((vh) => {
-      const r = el.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > vh + 200) return;
-      const lit = clamp((vh * 0.82 - r.top) / (r.height + vh * 0.3), 0, 1) * words.length;
-      const n = Math.round(lit * 4);
-      if (n === shown) return; shown = n;
-      words.forEach((w, i) => { w.style.opacity = clamp(lit - i + 1, 0.16, 1).toFixed(2); });
-    });
-  });
-
-  // Gentle image parallax (uses the `translate` property so it composes with hover/entrance scale)
-  $$('.hero__bg, .photo-card img, .who__photo img, .cta__bg, .split__media img, .phero__media img').forEach((img) => {
-    img.classList.add('plx');
-    const box = img.parentElement;
-    const amt = img.classList.contains('hero__bg') ? 8 : 5;
-    scrollers.push((vh) => {
-      const r = box.getBoundingClientRect();
-      if (r.bottom < -100 || r.top > vh + 100) return;
-      const p = (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2);
-      img.style.translate = `0 ${(p * -amt).toFixed(2)}%`;
-    });
-  });
-
-  // Process cards: each one settles back as the next stacks over it
-  const steps = $$('.steps .step');
-  if (steps.length) scrollers.push((vh) => {
-    if (innerWidth < 900) return;
-    steps.forEach((s, i) => {
-      const next = steps[i + 1];
-      if (!next) return;
-      const a = s.getBoundingClientRect(), b = next.getBoundingClientRect();
-      if (a.bottom < -50 || a.top > vh) return;
-      const p = clamp((a.bottom - b.top) / a.height, 0, 1);
-      s.style.scale = (1 - 0.06 * p).toFixed(4);
-      s.style.setProperty('--dim', (p * 0.35).toFixed(3));
-    });
-  });
-
-  // Header hides on the way down, returns on the way up
-  const hdr = $('[data-hdr]');
-  let lastY = scrollY;
-  scrollers.push(() => {
-    const y = scrollY;
-    if (hdr && !d.body.classList.contains('menu-open')) hdr.classList.toggle('is-tucked', y > lastY && y > 700);
-    lastY = y;
-  });
-  runScroll();
-
-  /* ---------- Big word bands drift, faster while you scroll ---------- */
-  $$('.marquee__track').forEach((row) => {
-    row.style.animation = 'none';
-    let x = 0, v = 0, ly = scrollY, half = row.scrollWidth / 2, on = false, raf = 0;
-    addEventListener('resize', () => { half = row.scrollWidth / 2; });
+  // Smooth wheel scrolling: mouse and trackpad only, never touch. Keyboard, scrollbar dragging,
+  // find-in-page and anchor jumps keep working natively; we simply follow the real position.
+  const smooth = (() => {
+    if (!fine || !BCE || window.BCE_NO_SMOOTH) return null;
+    let target = scrollY, cur = scrollY, raf = 0, active = false;
+    const max = () => root.scrollHeight - innerHeight;
+    const go = (y) => { scrollTo({ top: y, behavior: 'instant' }); };
     const tick = () => {
-      const y = scrollY, dy = Math.abs(y - ly); ly = y;
-      v += (Math.min(dy, 140) * 0.09 - v) * 0.1;
-      x -= 0.55 + v;
-      if (half && -x >= half) x += half;
-      row.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
-      if (on) raf = requestAnimationFrame(tick);
+      cur += (target - cur) * 0.11;
+      if (Math.abs(target - cur) < 0.4) { cur = target; active = false; }
+      go(cur); BCE.flush();
+      if (active) raf = requestAnimationFrame(tick); else raf = 0;
     };
-    new IntersectionObserver(([e]) => { on = e.isIntersecting; cancelAnimationFrame(raf); if (on) raf = requestAnimationFrame(tick); }).observe(row.parentElement);
+    const start = () => { if (!active) { active = true; raf = requestAnimationFrame(tick); } };
+    const stop = () => { if (active) { active = false; cancelAnimationFrame(raf); } target = cur = scrollY; };
+    const canScroll = (el, dy) => {
+      for (; el && el !== d.body && el !== root; el = el.parentElement) {
+        if (el.scrollHeight <= el.clientHeight + 1) continue;
+        const o = getComputedStyle(el).overflowY;
+        if ((o === 'auto' || o === 'scroll') && (dy > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0)) return true;
+      }
+      return false;
+    };
+    addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.defaultPrevented || covered() || d.body.classList.contains('menu-open')) return;
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || canScroll(e.target, e.deltaY)) return;
+      e.preventDefault();
+      if (!active) target = cur = scrollY;
+      const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1);
+      target = clamp(target + dy, 0, max());
+      start();
+    }, { passive: false });
+    addEventListener('pointerdown', stop);
+    addEventListener('keydown', (e) => { if (!e.ctrlKey && !e.metaKey) stop(); });
+    addEventListener('scroll', () => { if (!active) target = cur = scrollY; }, { passive: true });
+    return { to(y) { if (!active) target = cur = scrollY; target = clamp(y, 0, max()); start(); } };
+  })();
+  window.BCE_SCROLL = smooth;
+
+  // In-page links glide to their target, clearing the header
+  d.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a || a.getAttribute('href').length < 2) return;
+    const t = d.getElementById(a.getAttribute('href').slice(1));
+    if (!t) return;
+    e.preventDefault();
+    const y = (window.BCE ? window.BCE.docTop(t) : t.getBoundingClientRect().top + scrollY) - 88;
+    if (smooth) smooth.to(y); else scrollTo({ top: y, behavior: 'smooth' });
+    history.replaceState(null, '', a.getAttribute('href'));
   });
+
+  if (BCE) {
+    // Statement lights up word by word
+    $$('.statement').forEach((el) => {
+      (function split(node) {
+        [...node.childNodes].forEach((n) => {
+          if (n.nodeType === 3) {
+            const frag = d.createDocumentFragment();
+            n.textContent.split(/(\s+)/).forEach((part) => {
+              if (!part) return;
+              if (/^\s+$/.test(part)) { frag.appendChild(d.createTextNode(part)); return; }
+              const w = d.createElement('span'); w.className = 'w'; w.textContent = part; frag.appendChild(w);
+            });
+            n.replaceWith(frag);
+          } else if (n.nodeType === 1 && !n.classList.contains('pill-img')) split(n);
+        });
+      })(el);
+      el.classList.add('is-words');
+      const words = $$('.w', el), op = words.map(() => -1);
+      let g = null;
+      BCE.onMeasure((sy) => { g = { top: BCE.docTop(el, sy), h: el.offsetHeight }; });
+      BCE.onFrame((y, vh) => {
+        if (!g) return;
+        const top = g.top - y;
+        if (top + g.h < -200 || top > vh + 200) return;
+        const lit = clamp((vh * 0.82 - top) / (g.h + vh * 0.3), 0, 1) * words.length;
+        words.forEach((w, i) => { const o = Math.round(clamp(lit - i + 1, 0.16, 1) * 20) / 20; if (o !== op[i]) { op[i] = o; w.style.opacity = o; } });
+      });
+    });
+
+    // Gentle image parallax (the `translate` property composes with hover and entrance scale)
+    const plx = $$('.hero__bg, .photo-card img, .who__photo img, .cta__bg, .split__media img, .story2__a').map((img) => {
+      img.classList.add('plx');
+      return { img, box: img.closest('.hero, .cta') || img.parentElement, amt: img.classList.contains('hero__bg') || img.classList.contains('cta__bg') ? 8 : 5, g: null, last: '' };
+    });
+    BCE.onMeasure((sy) => plx.forEach(p => { p.g = { top: BCE.docTop(p.box, sy), h: p.box.offsetHeight }; }));
+    BCE.onFrame((y, vh) => plx.forEach((p) => {
+      if (!p.g) return;
+      const top = p.g.top - y;
+      if (top + p.g.h < -100 || top > vh + 100) return;
+      const v = `0 ${(((top + p.g.h / 2 - vh / 2) / (vh / 2 + p.g.h / 2)) * -p.amt).toFixed(2)}%`;
+      if (v !== p.last) { p.last = v; p.img.style.translate = v; }
+    }));
+
+    // Big sections rise and settle into place as they arrive, so one flows into the next
+    const panels = $$('.panel, .sec--ink, .sec--ink2, .cta, .calc, .day__card, .explore__stage, .wait, .track').filter(el => !el.closest('.hero'))
+      .map((el) => { el.classList.add('flow'); return { el, g: null, q: -1 }; });
+    BCE.onMeasure((sy) => panels.forEach(p => { p.el.style.scale = ''; p.el.style.translate = ''; p.g = { top: BCE.docTop(p.el, sy) }; p.q = -1; }));
+    BCE.onFrame((y, vh) => panels.forEach((p) => {
+      if (!p.g) return;
+      const t = clamp((vh - (p.g.top - y)) / (vh * 0.55), 0, 1);
+      const q = Math.round((1 - Math.pow(1 - t, 3)) * 400) / 400;
+      if (q === p.q) return; p.q = q;
+      const big = p.el.classList.contains('panel') || p.el.classList.contains('cta') || p.el.classList.contains('sec--ink') || p.el.classList.contains('sec--ink2');
+      p.el.style.scale = q >= 1 ? '' : (1 - (big ? 0.045 : 0.06) * (1 - q)).toFixed(4);
+      p.el.style.translate = q >= 1 ? '' : `0 ${((1 - q) * (big ? 48 : 36)).toFixed(1)}px`;
+    }));
+
+    // Process cards: each one settles back as the next stacks over it (sticky top: 92px)
+    const stepEls = $$('.steps .step');
+    if (stepEls.length) {
+      let sg = null; const last = stepEls.map(() => '');
+      BCE.onMeasure((sy) => {
+        if (innerWidth < 900) { sg = null; stepEls.forEach(s => { s.style.scale = ''; s.style.removeProperty('--dim'); }); return; }
+        const ol = stepEls[0].parentElement, gap = parseFloat(getComputedStyle(ol).rowGap) || 0;
+        let top = BCE.docTop(ol, sy);
+        sg = stepEls.map(s => { const g = { top, h: s.offsetHeight }; top += g.h + gap; return g; });
+      });
+      BCE.onFrame((y) => {
+        if (!sg) return;
+        sg.forEach((g, i) => {
+          const next = sg[i + 1]; if (!next) return;
+          const stuckTop = Math.max(92, g.top - y);
+          const p = clamp((stuckTop + g.h - (next.top - y)) / g.h, 0, 1);
+          const v = (1 - 0.06 * p).toFixed(3);
+          if (v === last[i]) return; last[i] = v;
+          stepEls[i].style.scale = v; stepEls[i].style.setProperty('--dim', (p * 0.35).toFixed(3));
+        });
+      });
+    }
+
+    // Header tucks away on the way down and returns on the way up
+    const hdr = $('[data-hdr]');
+    let lastY = scrollY, tucked = false;
+    BCE.onFrame((y) => {
+      const t = y > lastY + 1 && y > 700 && !d.body.classList.contains('menu-open') ? true : y < lastY - 1 || y <= 700 ? false : tucked;
+      lastY = y;
+      if (hdr && t !== tucked) { tucked = t; hdr.classList.toggle('is-tucked', t); }
+    });
+
+    // Word bands: a compositor animation that speeds up while you scroll (no per-frame style writes)
+    const bands = $$('.marquee__track').map(row => ({ row, anim: null, rate: 1 }));
+    let vel = 0, ly = scrollY;
+    BCE.onFrame((y) => {
+      vel += (Math.min(Math.abs(y - ly), 160) * 0.05 - vel) * 0.2; ly = y;
+      bands.forEach((b) => {
+        if (!b.anim) b.anim = b.row.getAnimations ? b.row.getAnimations()[0] : null;
+        if (!b.anim) return;
+        const r = Math.round((1 + vel) * 20) / 20;
+        if (r !== b.rate) { b.rate = r; b.anim.playbackRate = r; }
+      });
+      if (vel > 0.05) BCE.request();        // keep easing back to cruising speed after scrolling stops
+    });
+
+    BCE.measure();
+  }
 
   /* ---------- Cards: a soft spotlight follows the pointer ---------- */
   if (fine) $$('.feats li, .svc, .pillar, .card, .cta__facts li, .calc__out, .opt, .step').forEach((c) => {
@@ -282,7 +365,9 @@
       if (!fine) return;
       setTimeout(() => {
         word.classList.add('is-live');
-        word.addEventListener('pointermove', (e) => letters.forEach((l) => { const r = l.getBoundingClientRect(), dx = Math.abs(e.clientX - (r.left + r.width / 2)); l.style.translate = `0 ${(-Math.max(0, 1 - dx / 240) * 12).toFixed(1)}%`; }));
+        let cx = [];
+        word.addEventListener('pointerenter', () => { cx = letters.map(l => { const r = l.getBoundingClientRect(); return r.left + r.width / 2; }); });
+        word.addEventListener('pointermove', (e) => letters.forEach((l, i) => { l.style.translate = `0 ${(-Math.max(0, 1 - Math.abs(e.clientX - (cx[i] || 0)) / 240) * 12).toFixed(1)}%`; }));
         word.addEventListener('pointerleave', () => letters.forEach(l => { l.style.translate = ''; }));
       }, 1400);
     }, '0px 0px -10% 0px');

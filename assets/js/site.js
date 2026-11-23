@@ -6,18 +6,47 @@
   const $ = (s, c = d) => c.querySelector(s);
   const $$ = (s, c = d) => [...c.querySelectorAll(s)];
 
+  /* ---------- One frame loop for every scroll effect on the site ----------
+     Layout is only read in the measure phase (load, resize, content size changes). Each frame,
+     effects work from the scroll position and the cached geometry and only write styles, so
+     scrolling never forces the browser to recalculate layout. motion.js plugs into the same loop. */
+  const BCE = window.BCE = (() => {
+    const measures = [], frames = [];
+    let vh = innerHeight, queued = false, mt = 0;
+    const frame = () => { queued = false; const y = scrollY; for (const f of frames) f(y, vh); };
+    const request = () => { if (!queued) { queued = true; requestAnimationFrame(frame); } };
+    const measure = () => { mt = 0; vh = innerHeight; const sy = scrollY; for (const m of measures) m(sy, vh); frame(); };
+    const remeasure = () => { clearTimeout(mt); mt = setTimeout(measure, 120); };
+    addEventListener('scroll', request, { passive: true });
+    addEventListener('resize', remeasure);
+    addEventListener('load', remeasure);
+    if (d.fonts) d.fonts.ready.then(remeasure);
+    if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe(d.body);
+    // layout position, ignoring transforms (sections mid-rise must not skew measurements)
+    const docTop = (el) => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y; };
+    return { onMeasure: (f) => measures.push(f), onFrame: (f) => frames.push(f), request, flush: frame, remeasure, measure, docTop };
+  })();
+
+  /* ---------- Decorative loops only run while they're on screen ----------
+     Dashed routes, power flows, clouds, glints and shimmers animate SVG properties on the main
+     thread. Paused off screen, they stop invalidating the page every frame, which is what made
+     each scroll frame pay for a full style and layout pass. */
+  if ('IntersectionObserver' in window) {
+    const zones = $$('.map, .day__scene, .explore__scene, .track, .hero, .topbar, .marquee, .split__media, .dot--live, .loader');
+    const io = new IntersectionObserver((es) => es.forEach(e => e.target.classList.toggle('is-off', !e.isIntersecting)), { rootMargin: '120px 0px' });
+    zones.forEach(z => io.observe(z));
+  }
+
   /* ---------- Header: transparent over the hero, solid once you scroll ---------- */
   const hdr = $('[data-hdr]'), mbar = $('.mbar'), concept = $('.concept');
-  let ticking = false;
-  const onScroll = () => {
-    const y = scrollY;
+  let sState = '';
+  BCE.onFrame((y, vh) => {
+    const s = `${y > 40}${y > 480}${y > vh * 0.85}`;
+    if (s === sState) return; sState = s;
     if (hdr) hdr.classList.toggle('is-scrolled', y > 40);
     if (mbar) mbar.classList.toggle('on', y > 480);
-    if (concept) concept.classList.toggle('on', y > innerHeight * 0.85);
-    ticking = false;
-  };
-  addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(onScroll); ticking = true; } }, { passive: true });
-  onScroll();
+    if (concept) concept.classList.toggle('on', y > vh * 0.85);
+  });
 
   /* ---------- Mobile menu ---------- */
   const menuBtn = $('[data-menu-btn]'), menu = $('#menu');
@@ -150,15 +179,20 @@
   $$('[data-journey]').forEach(j => {
     const steps = $$('[data-j-step]', j), imgs = $$('[data-j-img]', j), cells = $$('[data-j-cell]', j);
     const num = $('[data-j-num]', j), name = $('[data-j-name]', j), time = $('[data-j-time]', j);
-    let cur = -1, raf = 0;
-    const update = () => {
-      raf = 0;
-      const mid = innerHeight * 0.5; let idx = 0;
-      steps.forEach((s, i) => {
-        const r = s.getBoundingClientRect();
-        cells[i].style.setProperty('--f', Math.max(0, Math.min(1, (mid - r.top) / Math.max(1, r.height))).toFixed(3));
-        if (r.top <= mid) idx = i;
+    let cur = -1, geo = [];
+    const fills = steps.map(() => -1);
+    BCE.onMeasure((sy) => { geo = steps.map(s => ({ top: BCE.docTop(s, sy), h: s.offsetHeight })); });
+    BCE.onFrame((y, vh) => {
+      if (!geo.length) return;
+      const mid = y + vh * 0.5; let idx = 0;
+      geo.forEach((g, i) => {
+        const f = Math.round(Math.max(0, Math.min(1, (mid - g.top) / Math.max(1, g.h))) * 200) / 200;
+        if (f !== fills[i]) { fills[i] = f; cells[i].style.setProperty('--f', f); }
+        if (g.top <= mid) idx = i;
       });
+      update(idx);
+    });
+    const update = (idx) => {
       if (idx === cur) return;
       cur = idx;
       imgs.forEach((im, k) => im.classList.toggle('is-on', k === idx));
@@ -169,14 +203,13 @@
       requestAnimationFrame(() => requestAnimationFrame(() => num.classList.remove('is-swap')));
     };
     cells.forEach((c, i) => $('button', c).addEventListener('click', () => {
-      const y = steps[i].getBoundingClientRect().top + scrollY - innerHeight * 0.3;
-      scrollTo({ top: y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      const y = (geo[i] ? geo[i].top : steps[i].getBoundingClientRect().top + scrollY) - innerHeight * 0.3;
+      if (window.BCE_SCROLL) window.BCE_SCROLL.to(y);
+      else scrollTo({ top: y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }));
     j.classList.add('is-live');
-    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
-    addEventListener('resize', update);
-    update();
   });
+  BCE.measure();
 
   /* ---------- Footer year ---------- */
   $$('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });

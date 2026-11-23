@@ -881,9 +881,9 @@ html.is-loading { overflow: hidden; }
 .pt__batt i:nth-child(2) { --d: .07s; } .pt__batt i:nth-child(3) { --d: .14s; } .pt__batt i:nth-child(4) { --d: .21s; } .pt__batt i:nth-child(5) { --d: .28s; }
 .pt__to { display: grid; justify-items: center; gap: 6px; }
 .pt__to b { font-size: clamp(26px, 3vw, 38px); font-weight: 750; letter-spacing: -0.045em; line-height: 1; }
-html.pt-out .pt { visibility: visible; pointer-events: auto; transform: none; transition: transform .6s var(--swoop); }
-html.pt-out .pt__in { opacity: 1; transform: none; transition: opacity .3s .25s, transform .5s var(--out) .25s; }
-html.pt-out .pt__batt i { background: var(--gold); transition: background-color .15s calc(.35s + var(--d, 0s)); }
+html.pt-out .pt { visibility: visible; pointer-events: auto; transform: none; transition: transform .5s var(--swoop); }
+html.pt-out .pt__in { opacity: 1; transform: none; transition: opacity .25s .2s, transform .45s var(--out) .2s; }
+html.pt-out .pt__batt i { background: var(--gold); transition: background-color .12s calc(.26s + var(--d, 0s) * .7); }
 html.pt-out main, html.pt-out .ftr { transform: scale(.97) translateY(-2vh); opacity: .5; transition: transform .7s var(--swoop), opacity .7s; }
 html.pt-in .pt { visibility: visible; transform: none; }
 html.pt-in .pt::before { display: none; }
@@ -892,7 +892,7 @@ html.pt-in .pt__in { opacity: 1; transform: none; }
 html.pt-in .pt__batt i, html.pt-leave .pt__batt i { background: var(--gold); }
 html.pt-in { overflow: hidden; }
 html.pt-in main { translate: 0 7vh; }
-html.pt-leave .pt { visibility: visible; transform: translateY(calc(-100% - 15vh)); transition: transform .85s var(--swoop) .05s; }
+html.pt-leave .pt { visibility: visible; transform: translateY(calc(-100% - 15vh)); transition: transform .75s var(--swoop); }
 html.pt-leave .pt::before { display: none; }
 html.pt-leave .pt__in { opacity: 0; transform: translateY(-40px); transition: opacity .35s .25s, transform .85s var(--swoop) .05s; }
 html.pt-leave main { translate: none; transition: translate 1.1s var(--out) .1s; }
@@ -941,6 +941,8 @@ html.is-loading .hero__bg.plx, html.pt-in .hero__bg.plx { scale: 1.2; }
 
 /* Big word bands are moved by script; keep them on their own layer */
 .marquee__track { will-change: transform; }
+.flow { transform-origin: 50% 0; }
+.is-off, .is-off *, .is-off::before, .is-off::after, .is-off *::before, .is-off *::after { animation-play-state: paused !important; }
 
 /* Footer wordmark: letters rise, then lift near the pointer */
 .ftr__word.is-split { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: inherit; }
