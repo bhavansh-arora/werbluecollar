@@ -17,6 +17,12 @@ A static multi-page site. No framework and no build tooling are needed to host i
 - Pages are composed from `src/pages/*.html` plus shared header, footer and CTA in `src/build.py`.
   After editing, run `python3 src/build.py` to regenerate the root HTML files.
 - Design tokens (colors, type, spacing) live at the top of `assets/css/site.css`.
+  It is one stylesheet with no override layers: change a rule where it is, don't append a new "pass" at the bottom.
+- Type is Barlow and Barlow Semi Condensed, self-hosted in `assets/fonts/` (no Google Fonts request).
+- Nothing is hidden waiting for scroll or for JavaScript. Calculator numbers for the default $220 bill
+  are written into the HTML (see `BILL` in `src/build.py` and the option cards), so the page is complete on first paint.
+  If you change `ASSUME`, update those defaults too.
+- Shared blocks (map, town list, bill slider, CTA, footer) are partials in `src/build.py`.
 - **Calculator assumptions** live in one object, `ASSUME`, at the top of `assets/js/calc.js`
   (utility rate, $/W, loan APR/term, PPA rate and escalator, production, net-billing value).
   The text explaining the assumptions on the page updates automatically.

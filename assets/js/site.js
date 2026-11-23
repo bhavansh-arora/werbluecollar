@@ -1,139 +1,35 @@
-/* Blue Collar Energy — core interactions. Concept by Code Bunny. */
+/* Blue Collar Energy — core interactions. Concept by Code Bunny.
+   Nothing here hides content: every section is visible as soon as the HTML arrives,
+   and the script only adds behaviour (menu, picker, live widgets). */
 (() => {
-  const d = document, root = d.documentElement;
-  root.classList.remove('no-js');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const d = document;
   const $ = (s, c = d) => c.querySelector(s);
   const $$ = (s, c = d) => [...c.querySelectorAll(s)];
 
-  /* ---------- Smooth scrolling (mouse & trackpad only; touch keeps native momentum) ---------- */
-  let lenis = null;
-  if (!reduce && window.Lenis && matchMedia('(pointer: fine)').matches) {
-    lenis = new window.Lenis({ lerp: 0.12, wheelMultiplier: 1, smoothWheel: true });
-    const tick = (t) => { lenis.raf(t); requestAnimationFrame(tick); };
-    requestAnimationFrame(tick);
-    // In-page anchors glide to their target, clearing the fixed header
-    d.addEventListener('click', (e) => {
-      const a = e.target.closest('a[href^="#"]');
-      if (!a || a.getAttribute('href').length < 2) return;
-      const target = d.querySelector(a.getAttribute('href'));
-      if (!target) return;
-      e.preventDefault();
-      lenis.scrollTo(target, { offset: -96 });
-      history.pushState(null, '', a.getAttribute('href'));
-    });
-    // Arriving with a #hash from another page
-    if (location.hash && d.querySelector(location.hash)) setTimeout(() => lenis.scrollTo(location.hash, { offset: -96, immediate: true }), 60);
-  }
-  window.BCE_LENIS = lenis;
-
-  /* ---------- Header: solid on scroll, hide on scroll down ---------- */
+  /* ---------- Header shadow, mobile quick bar, concept badge ---------- */
   const hdr = $('[data-hdr]'), mbar = $('.mbar'), concept = $('.concept');
-  let lastY = scrollY, ticking = false;
+  let ticking = false;
   const onScroll = () => {
     const y = scrollY;
-    if (hdr) {
-      hdr.classList.toggle('is-scrolled', y > 40);
-      const goingDown = y > lastY && y > 640 && !d.body.classList.contains('menu-open');
-      hdr.classList.toggle('is-hidden', goingDown);
-    }
+    if (hdr) hdr.classList.toggle('is-scrolled', y > 8);
     if (mbar) mbar.classList.toggle('on', y > 480);
     if (concept) concept.classList.toggle('on', y > innerHeight * 0.85);
-    lastY = y; ticking = false;
+    ticking = false;
   };
   addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(onScroll); ticking = true; } }, { passive: true });
   onScroll();
 
-  /* ---------- Menu ---------- */
-  const menuBtn = $('[data-menu-btn]');
+  /* ---------- Mobile menu ---------- */
+  const menuBtn = $('[data-menu-btn]'), menu = $('#menu');
   const setMenu = (open) => {
     d.body.classList.toggle('menu-open', open);
-    menuBtn && menuBtn.setAttribute('aria-expanded', String(open));
-    const m = $('#menu'); if (m) m.toggleAttribute('inert', !open);
-    if (lenis) open ? lenis.stop() : lenis.start();
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', String(open));
+    if (menu) menu.toggleAttribute('inert', !open);
   };
-  menuBtn && menuBtn.addEventListener('click', () => setMenu(!d.body.classList.contains('menu-open')));
+  if (menuBtn) menuBtn.addEventListener('click', () => setMenu(!d.body.classList.contains('menu-open')));
   $$('#menu a').forEach(a => a.addEventListener('click', () => setMenu(false)));
   addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
-  addEventListener('resize', () => { if (innerWidth >= 1140) setMenu(false); });
-
-  /* ---------- Split lines: stagger index ---------- */
-  $$('.split-line').forEach(el => $$('.line > span', el).forEach((s, i) => s.style.setProperty('--i', i)));
-
-  /* ---------- Reveal on view ---------- */
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
-  }, { rootMargin: '0px 0px 12% 0px', threshold: 0 }); // reveal just before it scrolls in, so nothing looks empty
-  $$('.rv, .rv-clip, .split-line, .phero__media, .tl__item, [data-count]').forEach(el => io.observe(el));
-
-  /* ---------- Counters ---------- */
-  const countIO = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      const el = e.target, to = parseFloat(el.dataset.count), dec = (el.dataset.count.split('.')[1] || '').length;
-      countIO.unobserve(el);
-      if (reduce) { el.textContent = to.toFixed(dec); return; }
-      const t0 = performance.now(), dur = 1600;
-      const tick = (t) => {
-        const p = Math.min(1, (t - t0) / dur), k = 1 - Math.pow(1 - p, 4);
-        el.textContent = (to * k).toFixed(dec);
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    });
-  }, { threshold: 0.4 });
-  $$('[data-count]').forEach(el => countIO.observe(el));
-
-  /* ---------- Manifesto: words light up as you scroll ---------- */
-  $$('[data-words]').forEach(el => {
-    const hl = (el.dataset.words || '').split('|').filter(Boolean).map(s => s.toLowerCase());
-    // Wrap words in text nodes only, so inline images inside the sentence survive
-    [...el.childNodes].forEach(node => {
-      if (node.nodeType !== 3) return;
-      const frag = d.createDocumentFragment();
-      node.textContent.split(/(\s+)/).forEach(part => {
-        if (!part) return;
-        if (/^\s+$/.test(part)) { frag.appendChild(d.createTextNode(' ')); return; }
-        const s = d.createElement('span');
-        s.className = 'w' + (hl.includes(part.toLowerCase().replace(/[^a-z']/g, '')) ? ' hl-word' : '');
-        s.textContent = part;
-        frag.appendChild(s);
-      });
-      node.replaceWith(frag);
-    });
-    const spans = $$('.w', el);
-    // One read + only the changed words per frame, and only while the paragraph is near the screen
-    let shown = -1, queued = false, near = false;
-    const update = () => {
-      queued = false;
-      const r = el.getBoundingClientRect(), vh = innerHeight;
-      const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
-      const n = Math.round(p * spans.length);
-      if (n === shown) return;
-      const lo = Math.min(n, Math.max(shown, 0)), hi = Math.max(n, shown);
-      for (let i = lo; i < hi; i++) spans[i].classList.toggle('on', i < n);
-      shown = n;
-    };
-    const onS = () => { if (!reduce && near && !queued) { queued = true; requestAnimationFrame(update); } };
-    new IntersectionObserver(([e]) => { near = e.isIntersecting; if (near) onS(); }, { rootMargin: '30% 0px' }).observe(el);
-    if (reduce) { spans.forEach(s => s.classList.add('on')); return; }
-    addEventListener('scroll', onS, { passive: true });
-    spans.forEach(s => s.classList.remove('on')); shown = 0; update();
-  });
-
-  /* ---------- Services list: hover swaps the photo ---------- */
-  $$('[data-svx]').forEach(box => {
-    const links = $$('.svx__list a', box), imgs = $$('.svx__media img', box), cap = $('[data-svx-cap]', box);
-    const set = (i) => {
-      links.forEach((a, k) => a.classList.toggle('is-on', k === i));
-      imgs.forEach((im, k) => im.classList.toggle('is-on', k === i));
-      if (cap) cap.textContent = `0${i + 1} / ${$('.svx__t', links[i]).textContent}`;
-    };
-    links.forEach((a, i) => { a.addEventListener('mouseenter', () => set(i)); a.addEventListener('focus', () => set(i)); });
-  });
-
-  /* ---------- Ticker: duplicate track for seamless loop ---------- */
-  $$('.ticker__track').forEach(t => { t.innerHTML += t.innerHTML; });
+  addEventListener('resize', () => { if (innerWidth >= 1100) setMenu(false); });
 
   /* ---------- Hero "What are we powering?" picker ---------- */
   $$('[data-picker]').forEach(p => {
@@ -143,31 +39,6 @@
       if (go) go.href = `quote.html?type=${b.dataset.type}`;
     }));
   });
-
-  /* ---------- Drag-to-scroll strips ---------- */
-  $$('[data-strip]').forEach(strip => {
-    let down = false, sx = 0, sl = 0, moved = 0;
-    strip.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; moved = 0; sx = e.clientX; sl = strip.scrollLeft; });
-    addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - sx; moved = Math.abs(dx); if (moved > 4) strip.classList.add('is-drag'); strip.scrollLeft = sl - dx; });
-    addEventListener('pointerup', () => { down = false; strip.classList.remove('is-drag'); });
-    const wrap = strip.closest('section');
-    const step = () => (strip.firstElementChild ? strip.firstElementChild.getBoundingClientRect().width + 24 : 400);
-    wrap && $$('[data-strip-prev]', wrap).forEach(b => b.addEventListener('click', () => strip.scrollBy({ left: -step(), behavior: 'smooth' })));
-    wrap && $$('[data-strip-next]', wrap).forEach(b => b.addEventListener('click', () => strip.scrollBy({ left: step(), behavior: 'smooth' })));
-  });
-
-  /* ---------- Process timeline rail ---------- */
-  const tl = $('[data-tl]');
-  if (tl) {
-    const fill = $('.tl__rail i', tl);
-    const upd = () => {
-      const r = tl.getBoundingClientRect();
-      const p = Math.min(1, Math.max(0, (innerHeight * 0.55 - r.top) / r.height));
-      fill.style.height = (p * 100) + '%';
-    };
-    let q = false;
-    addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(() => { q = false; upd(); }); } }, { passive: true }); upd();
-  }
 
   /* ---------- Live sun widget (Grover Beach, CA) ---------- */
   const sunEl = $('[data-sun]');

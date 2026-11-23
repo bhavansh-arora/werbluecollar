@@ -1,20 +1,19 @@
 <!--META {"title": "Free Solar Quote & Contact | Blue Collar Energy, Grover Beach", "desc": "Get a free solar quote in about 60 seconds. Tell us about your project and your bill, choose buy, finance, PPA or all three, and we'll reply within one business day.", "nav": "quote", "scripts": ["calc", "quote"], "cta": false} -->
 
-<section class="phero" style="padding-bottom: clamp(140px, 14vw, 200px)" aria-labelledby="ph-h">
-  <div class="phero__glow"></div>
-  <div class="wrap">
-    <div class="phero__crumb"><a href="index.html">Home</a><i></i><span>Free quote &amp; contact</span></div>
-    <div class="phero__grid">
-      <h1 class="d-xl phero__title split-line" id="ph-h"><span class="line"><span>Real numbers <span class="pill-img" aria-hidden="true"><img src="assets/img/home-door-sm.webp" alt=""></span></span></span><span class="line"><span>in <span class="serif hl">60 seconds.</span></span></span></h1>
-      <div class="phero__side rv" style="--d:.3s">
-        <p>Five quick steps. Your answers go straight to David and Christian, so the first call starts with your numbers, not twenty questions. We reply within one business day.</p>
-        <div class="picker__ticks"><span>{{ic:check}}Free site check</span><span>{{ic:check}}No obligation</span><span>{{ic:check}}Progress saves as you go</span></div>
-      </div>
+<section class="phero phero--slim" aria-labelledby="ph-h">
+  <div class="wrap phero__grid">
+    <div class="phero__text">
+      <nav class="phero__crumb" aria-label="Breadcrumb"><a href="index.html">Home</a> / <span>Free quote &amp; contact</span></nav>
+      <h1 class="d-xl" id="ph-h">Real numbers in 60 seconds.</h1>
+    </div>
+    <div class="phero__aside">
+      <p>Five quick steps. Your answers go straight to David and Christian, so the first call starts with your numbers, not twenty questions. We reply within one business day.</p>
+      <ul class="ticks"><li>{{ic:check}}Free site check</li><li>{{ic:check}}No obligation</li><li>{{ic:check}}Progress saves as you go</li></ul>
     </div>
   </div>
 </section>
 
-<section class="sec sec--flush-top" style="margin-top: clamp(-150px, -11vw, -96px)" aria-label="Quote form">
+<section class="sec sec--tight" aria-label="Quote form">
   <div class="wrap">
     <div class="wiz">
       <div>
@@ -22,7 +21,7 @@
           <div class="wiz__top"><span data-step-lbl>Step 1 of 5</span><span data-step-name>Project</span></div>
           <div class="wiz__bar" aria-hidden="true"><i></i></div>
 
-          <fieldset class="wiz__step" data-auto style="border:0;padding:0;margin:0">
+          <fieldset class="wiz__step" data-auto>
             <legend class="sr-only">Project type</legend>
             <h2>What are we powering?</h2>
             <p>Pick the closest fit. You can tell us more at the end.</p>
@@ -35,7 +34,7 @@
             <p class="field__err" data-err></p>
           </fieldset>
 
-          <fieldset class="wiz__step" style="border:0;padding:0;margin:0">
+          <fieldset class="wiz__step">
             <legend class="sr-only">Monthly bill</legend>
             <h2>What's your average electric bill?</h2>
             <p>A rough monthly average is fine. It's how we size the system and estimate savings. Watch the estimate update.</p>
@@ -47,7 +46,7 @@
             </div>
           </fieldset>
 
-          <fieldset class="wiz__step" data-auto style="border:0;padding:0;margin:0">
+          <fieldset class="wiz__step" data-auto>
             <legend class="sr-only">Property</legend>
             <h2>Tell us about the property.</h2>
             <div class="field"><span class="lbl">Do you own it?</span>
@@ -58,7 +57,7 @@
               </div>
             </div>
             <div class="field"><span class="lbl">How old is the roof?</span>
-              <div class="tiles" style="grid-template-columns:repeat(2,1fr)" data-group="roof">
+              <div class="tiles" data-group="roof">
                 <button type="button" class="tile" data-val="<10"><b>Under 10 years</b></button>
                 <button type="button" class="tile" data-val="10-20"><b>10 to 20 years</b></button>
                 <button type="button" class="tile" data-val="20+"><b>20+ years</b></button>
@@ -68,7 +67,7 @@
             </div>
           </fieldset>
 
-          <fieldset class="wiz__step" data-auto style="border:0;padding:0;margin:0">
+          <fieldset class="wiz__step" data-auto>
             <legend class="sr-only">Payment preference</legend>
             <h2>How are you leaning on payment?</h2>
             <p>No commitment. It just tells us which numbers to lead with. <a class="link-u" href="payment-options.html#match" target="_blank">Not sure? Take the 4-tap quiz</a></p>
@@ -81,7 +80,7 @@
             <p class="field__err" data-err></p>
           </fieldset>
 
-          <fieldset class="wiz__step" style="border:0;padding:0;margin:0">
+          <fieldset class="wiz__step">
             <legend class="sr-only">Contact details</legend>
             <h2>Where should we send your numbers?</h2>
             <div class="fields fields--2">
@@ -90,15 +89,15 @@
             </div>
             <div class="fields fields--2">
               <div class="field"><label for="f-email">Email address</label><input class="input" id="f-email" data-f="email" type="email" autocomplete="email" required><p class="field__err"></p></div>
-              <div class="field"><label for="f-addr">Property address or ZIP <span class="muted" style="font-weight:400">(optional)</span></label><input class="input" id="f-addr" data-f="address" autocomplete="street-address"><p class="field__err"></p></div>
+              <div class="field"><label for="f-addr">Property address or ZIP <span class="opt-l">(optional)</span></label><input class="input" id="f-addr" data-f="address" autocomplete="street-address"><p class="field__err"></p></div>
             </div>
-            <div class="field"><label for="f-notes">Anything else? <span class="muted" style="font-weight:400">(optional)</span></label><textarea class="input" id="f-notes" data-f="notes" placeholder="Tell us about your roof, your bills, or your questions"></textarea></div>
+            <div class="field"><label for="f-notes">Anything else? <span class="opt-l">(optional)</span></label><textarea class="input" id="f-notes" data-f="notes" placeholder="Tell us about your roof, your bills, or your questions"></textarea></div>
             <p class="tiny muted">We'll only use this to reply about your quote. No spam, no call centers.</p>
           </fieldset>
 
           <div class="wiz__nav">
             <button type="button" class="match__back" data-back>{{ic:arrow-l}} Back</button>
-            <button type="submit" class="btn" data-next><span data-next-t>Continue</span><span class="btn__ic">{{ic:arrow}}</span></button>
+            <button type="submit" class="btn" data-next><span data-next-t>Continue</span>{{ic:arrow-r}}</button>
           </div>
         </form>
 
@@ -111,13 +110,13 @@
             <li>We look at your roof, your shade and a year of bills.</li>
             <li>You get purchase, finance and PPA numbers side by side, on paper.</li>
           </ol>
-          <div class="btns"><a class="btn" href="payment-options.html">Explore the 3 ways to pay<span class="btn__ic">{{ic:arrow}}</span></a><a class="btn btn--ghost" href="{{TEL}}">Call {{PHONE}}</a></div>
+          <div class="btns"><a class="btn" href="payment-options.html">Explore the 3 ways to pay{{ic:arrow-r}}</a><a class="btn btn--ghost" href="{{TEL}}">Call {{PHONE}}</a></div>
         </div>
       </div>
 
       <aside class="wiz__side">
         <div class="est" aria-live="polite">
-          <div class="flex-between" style="align-items:center"><span class="eyebrow eyebrow--plain" style="color:var(--t-light-2)"><i class="dot dot--live"></i>Live estimate</span><span class="chip" data-e="type">—</span></div>
+          <div class="est__head"><span>Live estimate</span><span class="chip" data-e="type">—</span></div>
           <div class="est__big"><span data-e="save-l">Est. monthly savings, year one</span><b data-e="save">$0</b></div>
           <div class="est__rows">
             <div class="est__row"><span>System size</span><b data-e="size">—</b></div>
@@ -125,10 +124,10 @@
             <div class="est__row"><span>Upfront</span><b data-e="up">—</b></div>
             <div class="est__row"><span>25-year net savings</span><b data-e="net">—</b></div>
           </div>
-          <p class="tiny" style="color:var(--t-light-3)">Illustrative, based on your bill and Central Coast sun. Your site check makes it exact. <a href="payment-options.html#assumptions" style="text-decoration:underline">Assumptions</a></p>
+          <p class="est__note">Illustrative, based on your bill and Central Coast sun. Your site check makes it exact. <a href="payment-options.html#assumptions">Assumptions</a></p>
         </div>
         <div class="contact-card" id="contact">
-          <h3 style="font-size:20px; font-weight:600">Rather talk to a person?</h3>
+          <h3>Rather talk to a person?</h3>
           <a class="row" href="{{TEL}}"><i>{{ic:phone}}</i><span><small>Call</small><b>{{PHONE}}</b></span></a>
           <a class="row" href="mailto:{{EMAIL}}"><i>{{ic:mail}}</i><span><small>Email</small><b>{{EMAIL}}</b></span></a>
           <a class="row" href="https://maps.google.com/?q=1198+Farroll+Rd+Suite+4+Grover+Beach+CA+93433" target="_blank" rel="noopener"><i>{{ic:pin}}</i><span><small>Office</small><b>1198 Farroll Rd, Suite 4<br>Grover Beach, CA 93433</b></span></a>

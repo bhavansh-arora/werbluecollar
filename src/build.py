@@ -72,21 +72,21 @@ def sprite():
 def head(meta):
     title = meta["title"]
     return f"""<!doctype html>
-<html lang="en" class="no-js">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content="{meta['desc']}">
-<meta name="theme-color" content="#07111f">
+<meta name="theme-color" content="#0e2236">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{meta['desc']}">
 <meta property="og:image" content="assets/img/hero-coast.webp">
 <meta property="og:type" content="website">
 <link rel="icon" href="assets/img/logo-mark.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400..800&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/barlow-sc-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/site.css">
 <script type="application/ld+json">{json.dumps({
     "@context": "https://schema.org", "@type": "HomeAndConstructionBusiness",
@@ -100,72 +100,63 @@ def ic(name, cls=""):
     c = f' class="{cls}"' if cls else ""
     return f'<svg{c} aria-hidden="true"><use href="#i-{name}"/></svg>'
 
-def header(active, solid=False):
+def header(active):
     links = "".join(
         f'<a href="{href}"{" aria-current=\"page\"" if key == active else ""}>{label}</a>' for key, href, label in NAV)
     return f"""
 <a class="skip" href="#main">Skip to content</a>
-<header class="hdr{' hdr--solid' if solid else ''}" data-hdr>
+<header class="hdr" data-hdr>
   <div class="hdr__bar">
     <a class="brand" href="index.html" aria-label="Blue Collar Energy, home">
       <span class="brand__mark"><img src="assets/img/logo-mark.png" alt="" width="40" height="40"></span>
-      <span class="brand__word"><b>Blue Collar</b><small>Energy · Grover Beach</small></span>
+      <span class="brand__word"><b>Blue Collar Energy</b><small>Solar · Grover Beach, CA</small></span>
     </a>
     <nav class="hdr__nav" aria-label="Main">{links}</nav>
     <a class="hdr__tel" href="{TEL}">{ic('phone')}{PHONE}</a>
-    <a class="btn btn--volt btn--sm hdr__cta" href="quote.html">Free quote<span class="btn__ic">{ic('arrow')}</span></a>
+    <a class="btn btn--volt btn--sm hdr__cta" href="quote.html">Free quote</a>
     <button class="hdr__menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu" data-menu-btn><span></span></button>
   </div>
 </header>
 <div class="menu" id="menu" inert>
   <nav class="menu__list" aria-label="Mobile">
-    <a href="index.html"{' aria-current="page"' if active == 'home' else ''}><span>01</span>Home</a>
-    {''.join(f'<a href="{href}"{" aria-current=\"page\"" if key == active else ""}><span>0{i+2}</span>{label if key != "quote" else "Free quote"}</a>' for i, (key, href, label) in enumerate(NAV))}
+    <a href="index.html"{' aria-current="page"' if active == 'home' else ''}>Home</a>
+    {''.join(f'<a href="{href}"{" aria-current=\"page\"" if key == active else ""}>{label}</a>' for key, href, label in NAV)}
   </nav>
   <div class="menu__foot">
-    <a class="btn btn--volt" href="quote.html">Get my free quote<span class="btn__ic">{ic('arrow')}</span></a>
+    <a class="btn btn--volt" href="quote.html">Get my free quote{ic('arrow-r')}</a>
     <div><a href="{TEL}">{PHONE}</a><br><a href="mailto:{EMAIL}">{EMAIL}</a></div>
     <div>{ADDR}</div>
   </div>
 </div>"""
 
-def ticker(items=None):
-    items = items or ["Free site check", "Three prices on paper", "Buy · Finance · PPA", "Permits & utility handled",
-                      "Same crew, same phone number", "Grover Beach → Santa Maria"]
-    inner = "".join(f'<span class="ticker__item">{t}{ic("bolt")}</span>' for t in items)
-    return f'<div class="ticker" aria-hidden="true"><div class="ticker__track">{inner}</div></div>'
-
 def cta_band(title=None, sub=None):
-    title = title or 'Ready to see what your roof <span class="serif">can do?</span>'
+    title = title or "Ready to see what your roof can do?"
     sub = sub or "A free site check, three prices on paper, and no pressure either way. We come back with real numbers for buying, financing or a PPA."
     return f"""
 <section class="cta" aria-labelledby="cta-h">
-  <svg class="cta__bolt" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>
   <div class="wrap cta__inner">
-    <div>
-      <span class="eyebrow"><b>Free quote</b> No obligation</span>
-      <h2 class="d-xl mt-m split-line" id="cta-h">{title}</h2>
-    </div>
-    <div class="cta__side rv">
+    <div class="cta__text">
+      <h2 class="d-l" id="cta-h">{title}</h2>
       <p>{sub}</p>
+    </div>
+    <div class="cta__side">
       <div class="btns">
-        <a class="btn" href="quote.html">Start my free quote<span class="btn__ic">{ic('arrow')}</span></a>
-        <a class="btn btn--ghost" href="{TEL}">Call {PHONE}</a>
+        <a class="btn" href="quote.html">Start my free quote{ic('arrow-r')}</a>
+        <a class="btn btn--ghost" href="{TEL}">{ic('phone')}Call {PHONE}</a>
       </div>
-      <div class="cta__contact"><a href="mailto:{EMAIL}">{ic('mail')}{EMAIL}</a><span>Reply within one business day</span></div>
+      <p class="cta__contact"><a href="mailto:{EMAIL}">{EMAIL}</a> · Reply within one business day</p>
     </div>
   </div>
 </section>"""
 
-def footer(flush=False):
+def footer():
     return f"""
-<footer class="ftr{' ftr--flush' if flush else ''}">
+<footer class="ftr">
   <div class="wrap">
     <div class="ftr__top">
       <div class="ftr__brand">
         <a class="brand" href="index.html"><span class="brand__mark"><img src="assets/img/logo-mark.png" alt="" width="40" height="40"></span><span class="brand__word"><b>Blue Collar Energy</b><small>Solar · Batteries · Ground mounts</small></span></a>
         <p>Solar for America, designed, permitted and installed from Grover Beach, California. Honest work, plain numbers, and a crew you can call by name after the panels are up.</p>
-        <a class="btn btn--volt btn--sm" href="quote.html">Get a free quote<span class="btn__ic">{ic('arrow')}</span></a>
       </div>
       <div>
         <h4>Pages</h4>
@@ -184,7 +175,6 @@ def footer(flush=False):
         </div>
       </div>
     </div>
-    <div class="ftr__mega" aria-hidden="true"><span>Blue</span><span>Collar</span></div>
     <div class="ftr__bot">
       <span>© <span data-year>2026</span> Blue Collar Energy · Grover Beach, California</span>
       <span>Website concept by <a href="preview-pack.html">Code Bunny</a></span>
@@ -193,11 +183,51 @@ def footer(flush=False):
 </footer>
 <nav class="mbar" aria-label="Quick actions">
   <a href="{TEL}">{ic('phone')}Call</a>
-  <a class="q" href="quote.html">{ic('bolt')}Free quote</a>
+  <a class="q" href="quote.html">Free quote{ic('arrow-r')}</a>
 </nav>"""
 
 def concept_badge():
-    return f'<a class="concept" href="preview-pack.html">Concept for Blue Collar <b>{ic("spark")}Preview pack</b></a>'
+    return '<a class="concept" href="preview-pack.html">Concept for Blue Collar · <b>Preview pack</b></a>'
+
+# Monthly-bill slider shared by the home and payment pages. Values are pre-filled for the
+# default $220 bill so the numbers are right on first paint; calc.js takes over on input.
+BILL = """<div class="cmp__ctrl">
+        <div class="cmp__bill">
+          <label for="bill-{id}">Your average monthly electric bill</label>
+          <output id="bill-out-{id}" for="bill-{id}" data-bill-out>$220<small>/month</small></output>
+        </div>
+        <div class="cmp__slider">
+          <input class="range" id="bill-{id}" type="range" min="60" max="800" step="10" value="220" data-bill aria-describedby="bill-out-{id}" style="--p:21.6%">
+          <div class="range__scale"><span>$60</span><span>$800+</span></div>
+        </div>
+        <dl class="cmp__derived">
+          <div><dt>System size</dt><dd data-v="size">4.0 kW</dd></div>
+          <div><dt>kWh per year</dt><dd data-v="kwh">6,600</dd></div>
+          <div><dt>Install cost</dt><dd data-v="cost">$12,400</dd></div>
+        </dl>
+      </div>"""
+
+TOWNS = ('<ul class="towns"><li class="towns__hq">' + ic("pin") + 'Grover Beach · HQ</li>' +
+         "".join(f"<li>{t}</li>" for t in ["Pismo Beach", "Arroyo Grande", "San Luis Obispo", "Santa Maria", "Oceano", "Nipomo", "Avila Beach"]) + "</ul>")
+
+MAP = """<figure class="map">
+      <svg viewBox="30 92 460 352" role="img" aria-label="Map of the Central Coast service area, centered on Grover Beach">
+        <path class="map__land" d="M500 0H215c-12 40-6 70-28 104-16 26-46 36-58 66-10 24 4 52-4 80-8 30-34 44-40 74-6 30 10 60 4 92-4 26-22 52-26 94h437z"/>
+        <path class="map__coast" d="M215 0c-12 40-6 70-28 104-16 26-46 36-58 66-10 24 4 52-4 80-8 30-34 44-40 74-6 30 10 60 4 92-4 26-22 52-26 94"/>
+        <circle class="map__reach" cx="205" cy="268" r="170"/>
+        <text class="map__sea" x="46" y="132">Pacific</text><text class="map__sea" x="46" y="150">Ocean</text>
+        <g class="map__town"><circle cx="262" cy="130" r="4.5"/><text x="273" y="134">San Luis Obispo</text></g>
+        <g class="map__town"><circle cx="162" cy="198" r="4"/><text x="173" y="202">Avila Beach</text></g>
+        <g class="map__town"><circle cx="196" cy="236" r="4"/><text x="207" y="240">Pismo Beach</text></g>
+        <g class="map__town"><circle cx="246" cy="266" r="4"/><text x="257" y="270">Arroyo Grande</text></g>
+        <g class="map__town"><circle cx="200" cy="296" r="4"/><text x="211" y="300">Oceano</text></g>
+        <g class="map__town"><circle cx="262" cy="336" r="4"/><text x="273" y="340">Nipomo</text></g>
+        <g class="map__town"><circle cx="286" cy="420" r="4.5"/><text x="297" y="424">Santa Maria</text></g>
+        <g class="map__hq"><circle cx="205" cy="268" r="8"/><rect x="54" y="254" width="128" height="28" rx="4"/><text x="118" y="273" text-anchor="middle">Grover Beach</text></g>
+      </svg>
+    </figure>"""
+
+PARTIALS = {"{{towns}}": TOWNS, "{{map}}": MAP}
 
 def build():
     out = []
@@ -208,11 +238,13 @@ def build():
         body = src[m.end():]
         body = re.sub(r"\{\{ic:([a-z-]+)(?::([a-z-_ ]+))?\}\}", lambda mm: ic(mm.group(1), mm.group(2) or ""), body)
         body = re.sub(r"<img (?![^>]*decoding=)", '<img decoding="async" ', body)  # decode off the main thread
-        body = body.replace("{{ticker}}", ticker()).replace("{{PHONE}}", PHONE).replace("{{TEL}}", TEL).replace("{{EMAIL}}", EMAIL).replace("{{ADDR}}", ADDR)
+        for k, v in PARTIALS.items():
+            body = body.replace(k, v)
+        body = body.replace("{{bill}}", BILL.replace("{id}", p.stem)).replace("{{PHONE}}", PHONE).replace("{{TEL}}", TEL).replace("{{EMAIL}}", EMAIL).replace("{{ADDR}}", ADDR)
         cta = cta_band(meta.get("cta_title"), meta.get("cta_sub")) if meta.get("cta", True) else ""
-        scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["vendor/lenis.min", "site"] + meta.get("scripts", []))
-        html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + header(meta.get("nav", ""), meta.get("solid", False)) +
-                f'\n<main id="main">\n{body}\n{cta}\n</main>' + footer(flush=not cta) +
+        scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site"] + meta.get("scripts", []))
+        html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + header(meta.get("nav", "")) +
+                f'\n<main id="main">\n{body}\n{cta}\n</main>' + footer() +
                 (concept_badge() if meta.get("badge", True) else "") + f"\n{scripts}\n</body>\n</html>\n")
         (ROOT / p.name).write_text(html)
         out.append(p.name)
