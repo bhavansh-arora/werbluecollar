@@ -1,1 +1,0 @@
-GSAP 3.13.0 (gsap, ScrollTrigger, SplitText) is distributed under the GSAP Standard 'no charge' license: https://gsap.com/standard-license

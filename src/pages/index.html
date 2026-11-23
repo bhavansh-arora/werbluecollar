@@ -1,244 +1,283 @@
-<!--META {"title": "Blue Collar Energy | Solar Installer in Grover Beach, CA · Central Coast", "desc": "Solar installed by a crew that shows up. Buy it, finance it, or pay only for the power. Blue Collar Energy prices all three side by side for Central Coast homes and businesses.", "nav": "home", "scripts": ["calc"], "modules": ["panel3d"], "importmap": true, "modulepreload": ["vendor/three.module.min.js", "panel3d.js"], "motion": true} -->
+<!--META {"title": "Blue Collar Energy | Solar Installer in Grover Beach, CA · Central Coast", "desc": "Solar installed by a crew that shows up. Buy it, finance it, or pay only for the power. Blue Collar Energy prices all three side by side for Central Coast homes and businesses.", "nav": "home", "scripts": ["calc"]} -->
 
-<!-- ============ STAGE: the 3D panel stays put while the hero and the story scroll over it ============ -->
-<div class="stage" data-stage>
-  <div class="stage__sticky" aria-hidden="true">
-    <img class="stage__poster" src="assets/img/hero-panel.webp" srcset="assets/img/hero-panel-sm.webp 900w, assets/img/hero-panel.webp 1800w" sizes="100vw" alt="" fetchpriority="high">
-    <canvas></canvas>
-    <div class="stage__tags">
-      <span class="tag3d" data-tag>Aluminum frame</span>
-      <span class="tag3d" data-tag>Tempered glass</span>
-      <span class="tag3d" data-tag>Encapsulant</span>
-      <span class="tag3d" data-tag>Solar cells</span>
-      <span class="tag3d" data-tag>Encapsulant</span>
-      <span class="tag3d" data-tag>Backsheet</span>
-      <span class="tag3d" data-tag>Junction box</span>
+<!-- ============ HERO ============ -->
+<section class="hero" aria-labelledby="hero-h">
+  <img class="hero__bg" src="assets/img/crew-install.webp" srcset="assets/img/crew-install-sm.webp 900w, assets/img/crew-install.webp 1800w" sizes="100vw" alt="" fetchpriority="high">
+  <div class="badge" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <defs><path id="badge-c" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
+      <text><textPath href="#badge-c" textLength="458">FREE SITE CHECK · NO PRESSURE · GROVER BEACH ·</textPath></text>
+    </svg>
+    <img src="assets/img/logo-mark.png" alt="">
+  </div>
+  <div class="wrap hero__in">
+    <p class="kicker kicker--dot">Solar · Batteries · Ground mounts — Grover Beach &amp; the Central Coast</p>
+    <h1 class="d-hero" id="hero-h">Solar, installed by a crew that <em>shows up.</em></h1>
+    <div class="hero__row">
+      <p class="hero__lede">We design, permit and install solar for Central Coast homes and businesses. Buy it, finance it, or pay only for the power. You see real numbers for all three before you decide.</p>
+      <div class="hero__ask" data-picker>
+        <div class="ask">
+          <label class="sr-only" for="ask-type">What are we powering?</label>
+          <select id="ask-type" data-picker-select>
+            <option value="home">Home solar</option>
+            <option value="business">Business solar</option>
+            <option value="battery">Battery storage</option>
+            <option value="ground">Ground mount</option>
+          </select>
+          {{btn:Get my estimate|quote.html?type=home|btn--gold" data-picker-go="}}
+        </div>
+        <ul class="ticks"><li>{{ic:check}}Free site check</li><li>{{ic:check}}Permits handled</li><li>{{ic:check}}Three prices on paper</li></ul>
+      </div>
     </div>
   </div>
+</section>
 
-  <section class="hero" aria-labelledby="hero-h">
-    <div class="wrap hero__in">
-      <p class="eyebrow" data-fade>Solar installer · Grover Beach, California</p>
-      <h1 class="d-hero" id="hero-h" data-split="hero">Solar installed by a crew that <em>shows&nbsp;up.</em></h1>
-      <p class="lede" data-fade>We design, permit and install solar for Central Coast homes and businesses. Buy it, finance it, or pay only for the power. You see real numbers for all three before you decide.</p>
-      <div class="btns" data-fade>
-        <a class="btn btn--volt" href="quote.html" data-magnetic>Get my free quote{{ic:arrow-r}}</a>
-        <a class="btn btn--ghost" href="#compare">Compare the 3 ways to pay</a>
-      </div>
-    </div>
-    <div class="dock" data-picker>
-      <div class="wrap dock__in">
-        <h2 class="dock__h">What are we powering?</h2>
-        <div class="dock__opts" role="group" aria-label="Project type">
-          <button type="button" data-type="home" aria-pressed="true">{{ic:home}}Home</button>
-          <button type="button" data-type="business" aria-pressed="false">{{ic:building}}Business</button>
-          <button type="button" data-type="battery" aria-pressed="false">{{ic:battery}}Battery</button>
-          <button type="button" data-type="ground" aria-pressed="false">{{ic:ground}}Ground mount</button>
-        </div>
-        <a class="btn btn--light" href="quote.html?type=home" data-picker-go>Start my quote{{ic:arrow-r}}</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="inside" id="inside" aria-labelledby="story-h">
-    <div class="inside__pin">
-      <div class="wrap inside__in">
-        <p class="eyebrow">What goes on your roof</p>
-        <h2 class="d-l" id="story-h" data-split>Seven parts. No&nbsp;mystery.</h2>
-        <p class="inside__lede">A solar panel is a well-built sandwich, not magic. Scroll and we'll take one apart.</p>
-        <ol class="inside__list">
-          <li data-step data-n="01"><b>Aluminum frame</b><span>Keeps it square and bolts to the racking.</span></li>
-          <li data-step data-n="02"><b>Tempered glass</b><span>Lets the light in, keeps hail and weather out.</span></li>
-          <li data-step data-n="03"><b>Encapsulant</b><span>Seals the cells in and cushions them.</span></li>
-          <li data-step data-n="04"><b>Solar cells</b><span>Silicon that turns sunlight into DC power.</span></li>
-          <li data-step data-n="05"><b>Encapsulant</b><span>A second seal under the cells.</span></li>
-          <li data-step data-n="06"><b>Backsheet</b><span>Insulates and protects the back.</span></li>
-          <li data-step data-n="07"><b>Junction box</b><span>Where the panel's wiring joins your system.</span></li>
-        </ol>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- ============ FACTS ============ -->
-<div class="facts">
-  <ul class="wrap facts__in">
-    <li>{{ic:pin}}<span><b>Based in Grover Beach</b>1198 Farroll Rd, Suite 4</span></li>
-    <li>{{ic:users}}<span><b>Our own crew</b>No subcontracted installs</span></li>
-    <li>{{ic:doc}}<span><b>Three prices on paper</b>Buy, finance or PPA</span></li>
-    <li>{{ic:shield}}<span><b>Permits &amp; utility handled</b>We file it, track it, chase it</span></li>
+<div class="wrap">
+  <ul class="facts">
+    <li><p class="kicker">Based in</p><b>Grover Beach, CA</b></li>
+    <li><p class="kicker">Pricing</p><b>Buy, finance or PPA</b></li>
+    <li><p class="kicker">Paperwork</p><b>Permits &amp; utility handled</b></li>
+    <li><p class="kicker">Crew</p><b>Our own, start to finish</b></li>
   </ul>
 </div>
 
-<!-- ============ WHY ============ -->
-<section class="sec" aria-labelledby="why-h">
-  <div class="wrap why">
-    <div class="shead">
-      <div>
-        <p class="eyebrow">Why Blue Collar</p>
-        <h2 class="d-l" id="why-h">Solar is a trade, not a sales pitch.</h2>
-      </div>
-      <p class="lede">No call-center scripts. No pressure at the kitchen table. Just a straight look at your roof, a price on paper, and a crew that treats your house like a job site they're proud of.</p>
-    </div>
-    <ul class="why__list">
-      <li><h3>Local</h3><p>A Central Coast company on Central Coast roofs. The people who quote your system are the people you can reach afterward.</p></li>
-      <li><h3>Your call</h3><p>Buy it, finance it, or PPA. We show you the numbers on all three before you decide. <a class="link-u" href="payment-options.html">Compare them{{ic:arrow-r}}</a></p></li>
-      <li><h3>One team</h3><p>Design, permits, install, monitoring. We handle the paperwork and the utility, and we're still here after the power comes on.</p></li>
-    </ul>
-  </div>
-</section>
+<div class="marquee" aria-hidden="true"><div class="marquee__track">
+  <span>Home solar</span><i>✦</i><span>Battery storage</span><i>✦</i><span>Ground mounts</span><i>✦</i><span>Commercial</span><i>✦</i><span>Monitoring</span><i>✦</i>
+  <span>Home solar</span><i>✦</i><span>Battery storage</span><i>✦</i><span>Ground mounts</span><i>✦</i><span>Commercial</span><i>✦</i><span>Monitoring</span><i>✦</i>
+</div></div>
 
-<!-- ============ SERVICES ============ -->
-<section class="sec sec--flush-top" aria-labelledby="svc-h">
-  <div class="wrap">
-    <div class="shead">
-      <div>
-        <p class="eyebrow">What we install</p>
-        <h2 class="d-l" id="svc-h">Four kinds of job. One standard.</h2>
-      </div>
-      <a class="link-u" href="services.html">All services{{ic:arrow-r}}</a>
+<!-- ============ 01 WHY ============ -->
+<section class="panel panel--forest" aria-labelledby="why-h" data-num="01">
+  <div class="why">
+    <div class="why__side">
+      <p class="label">01 / Why Blue Collar</p>
+      <figure class="photo-card">
+        <img src="assets/img/roof-measure-sm.webp" alt="Blue Collar installer measuring a roof with the ocean behind" loading="lazy">
+        <figcaption><b>3</b><span>prices on paper,<br>every proposal</span></figcaption>
+      </figure>
     </div>
-    <ul class="svlist" data-svlist>
-      <li><a href="services.html#homes" data-img="assets/img/home-hills-sm.webp">
-        <span class="svlist__t">Homes</span>
-        <span class="svlist__d">Roof-mounted systems sized to your roof, your shade and a year of your bills.</span>
-        <span class="svlist__go">{{ic:arrow-r}}</span>
-        <img class="svlist__thumb" src="assets/img/home-hills-sm.webp" alt="" loading="lazy"></a></li>
-      <li><a href="services.html#business" data-img="assets/img/commercial-sm.webp">
-        <span class="svlist__t">Businesses</span>
-        <span class="svlist__d">Commercial and flat-roof systems, with the permits and utility paperwork handled.</span>
-        <span class="svlist__go">{{ic:arrow-r}}</span>
-        <img class="svlist__thumb" src="assets/img/commercial-sm.webp" alt="" loading="lazy"></a></li>
-      <li><a href="services.html#battery" data-img="assets/img/battery-sm.webp">
-        <span class="svlist__t">Battery storage</span>
-        <span class="svlist__d">Stores daytime solar for the evening and keeps essentials running in an outage.</span>
-        <span class="svlist__go">{{ic:arrow-r}}</span>
-        <img class="svlist__thumb" src="assets/img/battery-sm.webp" alt="" loading="lazy"></a></li>
-      <li><a href="services.html#ground" data-img="assets/img/vineyard-sm.webp">
-        <span class="svlist__t">Ground mounts</span>
-        <span class="svlist__d">Arrays for ranches, vineyards and properties where the roof isn't the best spot.</span>
-        <span class="svlist__go">{{ic:arrow-r}}</span>
-        <img class="svlist__thumb" src="assets/img/vineyard-sm.webp" alt="" loading="lazy"></a></li>
-    </ul>
-  </div>
-</section>
-
-<!-- ============ PAYMENT COMPARATOR ============ -->
-<section class="sec sec--ink" id="compare" aria-labelledby="cmp-h">
-  <div class="wrap">
-    <div class="shead">
-      <div>
-        <p class="eyebrow">Three ways to go solar</p>
-        <h2 class="d-l" id="cmp-h">Own it. Finance it. Or just pay for the power.</h2>
-      </div>
-      <p class="muted">Every roof and every budget is different, so we price all three side by side. Drag the slider to your monthly electric bill and watch the numbers move.</p>
-    </div>
-
-    <div class="cmp" data-cmp>
-      {{bill}}
-      <div class="opts">
-        <article class="opt opt-buy">
-          <div class="opt__head"><h3>Purchase</h3><span class="opt__badge">Biggest savings</span></div>
-          <p class="opt__line">Own the system outright. The biggest long-term savings and full control, with nothing owed to anyone.</p>
-          <div class="opt__big"><span>25-year net savings</span><b data-v="buy-net">$64,425</b></div>
-          <div class="opt__nums">
-            <div class="opt__num"><span>Upfront</span><b data-v="buy-up">$12,400</b></div>
-            <div class="opt__num"><span>Monthly payment</span><b data-v="buy-mo">$0</b></div>
-            <div class="opt__num"><span>Pays for itself</span><b data-v="buy-be">Year 6</b></div>
-          </div>
-          <a class="link-u" href="quote.html?bill=220&amp;pay=buy" data-quote-link data-pay="buy">Price a purchase{{ic:arrow-r}}</a>
-        </article>
-        <article class="opt opt-fin">
-          <div class="opt__head"><h3>Finance</h3><span class="opt__badge">$0 down · you own it</span></div>
-          <p class="opt__line">Low monthly payments with no hidden fees. The system is yours the day the loan is paid off.</p>
-          <div class="opt__big"><span>25-year net savings</span><b data-v="fin-net">$51,951</b></div>
-          <div class="opt__nums">
-            <div class="opt__num"><span>Upfront</span><b data-v="fin-up">$0</b></div>
-            <div class="opt__num"><span>Loan payment</span><b data-v="fin-mo">$104/mo</b></div>
-            <div class="opt__num"><span>Saved, month one</span><b data-v="fin-save">+$72/mo</b></div>
-          </div>
-          <a class="link-u" href="quote.html?bill=220&amp;pay=fin" data-quote-link data-pay="fin">Price financing{{ic:arrow-r}}</a>
-        </article>
-        <article class="opt opt-ppa">
-          <div class="opt__head"><h3>PPA</h3><span class="opt__badge">$0 upfront · no loan</span></div>
-          <p class="opt__line">Power Purchase Agreement. No upfront cost. You pay a set rate only for the power your panels produce.</p>
-          <div class="opt__big"><span>25-year net savings</span><b data-v="ppa-net">$19,072</b></div>
-          <div class="opt__nums">
-            <div class="opt__num"><span>Upfront</span><b data-v="ppa-up">$0</b></div>
-            <div class="opt__num"><span>Power bill (PPA)</span><b data-v="ppa-mo">$143/mo</b></div>
-            <div class="opt__num"><span>Saved, month one</span><b data-v="ppa-save">+$33/mo</b></div>
-          </div>
-          <a class="link-u" href="quote.html?bill=220&amp;pay=ppa" data-quote-link data-pay="ppa">Price a PPA{{ic:arrow-r}}</a>
-        </article>
-      </div>
-      <div class="cmp__foot">
-        <p class="cmp__note">Illustrative estimates for a Central Coast home. Your proposal uses your roof, your shade and a year of your actual bills. <a href="payment-options.html#assumptions">See every assumption</a></p>
-        <div class="btns">
-          <a class="btn btn--ghost btn--sm" href="payment-options.html#match">Which one fits me?</a>
-          <a class="btn btn--volt btn--sm" href="payment-options.html">Full 25-year comparison{{ic:arrow-r}}</a>
-        </div>
-      </div>
+    <div class="why__main">
+      <h2 class="statement" id="why-h"><b>Blue Collar</b> treats solar as a trade, not a sales pitch. <span class="pill-img" aria-hidden="true"><img src="assets/img/panel-close-sm.webp" alt=""></span> No call-center scripts, no pressure at the kitchen table: just a straight look at your roof, a price on paper, and a crew that's <em>proud of the job.</em></h2>
+      <ul class="feats">
+        <li><i class="feats__ic">{{ic:pin}}</i><h3>Local.</h3><p>A Central Coast company on Central Coast roofs. The people who quote your system are the people you can reach afterward.</p></li>
+        <li><i class="feats__ic">{{ic:doc}}</i><h3>Your call.</h3><p>Buy it, finance it, or PPA. We put the numbers for all three side by side before you decide.</p></li>
+        <li><i class="feats__ic">{{ic:users}}</i><h3>One team.</h3><p>Design, permits, install and monitoring. We handle the paperwork and the utility, and we're still here after.</p></li>
+      </ul>
     </div>
   </div>
 </section>
 
-<!-- ============ PROCESS ============ -->
-<section class="sec" aria-labelledby="proc-h">
+<section class="panel panel--navy stats" aria-label="Blue Collar at a glance">
+  <ul>
+    <li><b>3<em>prices</em></b><p class="kicker">On paper</p><p>Purchase, finance and PPA, side by side</p></li>
+    <li><b>$0<em>to start</em></b><p class="kicker">Site check</p><p>Free, with no obligation either way</p></li>
+    <li><b>1<em>crew</em></b><p class="kicker">Start to finish</p><p>Design, permits, install and monitoring</p></li>
+    <li><b>4<em>steps</em></b><p class="kicker">To power on</p><p>Site check, proposal, install, switch-on</p></li>
+  </ul>
+</section>
+
+<!-- ============ 02 SERVICES ============ -->
+<section class="sec" aria-labelledby="svc-h" data-num="02">
   <div class="wrap">
-    <div class="shead">
-      <div>
-        <p class="eyebrow">How it works</p>
-        <h2 class="d-l" id="proc-h">From your roof to your first sunny bill.</h2>
+    <div class="head">
+      <p class="label">02 / Services</p>
+      <h2 class="d-l" id="svc-h">For every <em>kind of roof.</em></h2>
+      <p class="head__note">Homes, businesses, batteries and ground mounts. Four kinds of job under one Grover Beach roof, each designed around the property in front of us.</p>
+    </div>
+    <div class="bento">
+      <a class="svc svc--forest svc--big" href="services.html#homes">
+        <span class="svc__top"><span class="label">01 · Residential</span><span class="chip">Homes · garages</span></span>
+        <span class="svc__img"><img src="assets/img/home-hills-sm.webp" alt="Home with a roof-mounted solar array below golden hills" loading="lazy"></span>
+        <span class="svc__t">Home <em>solar.</em></span>
+        <span class="svc__d">Panels sized to your roof, your shade and a year of your real bills.</span>
+        <span class="more">Explore {{ic:arrow}}</span>
+      </a>
+      <a class="svc svc--ember svc--big" href="services.html#business">
+        <span class="svc__top"><span class="label">02 · Commercial</span><span class="chip">Shops · wineries</span></span>
+        <span class="svc__img"><img src="assets/img/commercial-sm.webp" alt="Commercial flat-roof solar array overlooking the coast" loading="lazy"></span>
+        <span class="svc__t">Commercial <em>solar.</em></span>
+        <span class="svc__d">Turn a roof into a lower operating cost, with permits and utility paperwork handled.</span>
+        <span class="more">Explore {{ic:arrow}}</span>
+      </a>
+      <a class="svc svc--navy" href="services.html#battery">
+        <span class="svc__top"><span class="label">03 · Storage</span><span class="chip">Outage-ready</span></span>
+        <span class="svc__img"><img src="assets/img/battery-sm.webp" alt="Home battery mounted on a garage wall" loading="lazy"></span>
+        <span class="svc__t">Battery <em>backup.</em></span>
+        <span class="svc__d">Store daytime sun for the evening peak and for outages.</span>
+        <span class="more">Explore {{ic:arrow}}</span>
+      </a>
+      <a class="svc svc--forest" href="services.html#ground">
+        <span class="svc__top"><span class="label">04 · Ground</span><span class="chip">Ranch · vineyard</span></span>
+        <span class="svc__img"><img src="assets/img/vineyard-sm.webp" alt="Ground-mounted solar array beside a hillside vineyard" loading="lazy"></span>
+        <span class="svc__t">Ground <em>mounts.</em></span>
+        <span class="svc__d">Arrays for acreage where the roof isn't the best spot.</span>
+        <span class="more">Explore {{ic:arrow}}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 ESTIMATE ============ -->
+<section class="panel panel--ember" id="compare" aria-labelledby="est-h" data-num="03">
+  <div class="head">
+    <p class="label">03 / Your estimate</p>
+    <h2 class="d-l" id="est-h">Your roof could be <em>paying you.</em></h2>
+    <p class="head__note">Set your average monthly bill and see all three ways to pay for a system sized to you, over the next 25 years.</p>
+  </div>
+  <div class="calc" data-cmp>
+    <div class="calc__ctrl">
+      <div class="calc__bill">
+        <label class="kicker" for="bill-home">Average monthly bill</label>
+        <output id="bill-out" for="bill-home" data-bill-out>$220</output>
       </div>
-      <a class="link-u" href="process.html">The full process, step by step{{ic:arrow-r}}</a>
+      <input class="range" id="bill-home" type="range" min="60" max="800" step="10" value="220" data-bill style="--p:21.6%">
+      <div class="range__scale"><span>$60</span><span>$800+</span></div>
+      <div class="calc__chips" role="group" aria-label="Quick picks">
+        <button type="button" data-bill-pick="150" aria-pressed="false">$150/mo</button><button type="button" data-bill-pick="220" aria-pressed="true">$220/mo</button><button type="button" data-bill-pick="400" aria-pressed="false">$400/mo</button><button type="button" data-bill-pick="600" aria-pressed="false">$600/mo</button>
+      </div>
+      <dl class="calc__sys">
+        <div><dt>System size</dt><dd data-v="size">4.0 kW</dd></div>
+        <div><dt>Install cost</dt><dd data-v="cost">$12,400</dd></div>
+      </dl>
+      {{btn:Get my exact numbers|quote.html?bill=220|btn--gold btn--block" data-quote-link data-pay="all}}
+    </div>
+    <div class="calc__out">
+      <div class="calc__top">
+        <div><p class="kicker">Estimated 25-year net savings · purchase</p><p class="calc__big" data-v="buy-net">$64,425</p></div>
+        <p class="calc__be"><em data-v="buy-be">Year 6</em><span class="kicker">to pay for itself</span></p>
+      </div>
+      <p class="kicker">Three ways to pay, compared</p>
+      <ul class="calc__ways">
+        <li class="opt-buy"><span class="calc__name"><i class="swatch"></i>Purchase<small>Upfront <b data-v="buy-up">$12,400</b>, then $0/mo</small></span><span class="calc__bar"><i data-bar="buy" style="width:100%"></i></span><b data-v="buy-net">$64,425</b></li>
+        <li class="opt-fin"><span class="calc__name"><i class="swatch"></i>Finance<small>$0 down · loan <b data-v="fin-mo">$104/mo</b></small></span><span class="calc__bar"><i data-bar="fin" style="width:80.6%"></i></span><b data-v="fin-net">$51,951</b></li>
+        <li class="opt-ppa"><span class="calc__name"><i class="swatch"></i>PPA<small>$0 upfront · power <b data-v="ppa-mo">$143/mo</b></small></span><span class="calc__bar"><i data-bar="ppa" style="width:29.6%"></i></span><b data-v="ppa-net">$19,072</b></li>
+      </ul>
+      <p class="calc__note">Illustrative estimates for a Central Coast home, before any incentives. Your free site check uses your roof, your shade and your actual bills. <a href="payment-options.html#assumptions">Every assumption</a> · <a href="payment-options.html">Full comparison</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 PAYBACK ============ -->
+<section class="sec" aria-labelledby="pb-h" data-num="04">
+  <div class="wrap">
+    <div class="head">
+      <p class="label">04 / Payback</p>
+      <h2 class="d-l" id="pb-h">Paid off by year {{pb:be}}. <em>Then it's yours.</em></h2>
+      <p class="head__note">The same example home from the estimate: a $220 monthly bill and a purchased 4.0 kW system. The early years pay it back; every year after is money you keep.</p>
+    </div>
+    <ol class="milestones">
+      <li><p class="kicker">Year 1</p><b>{{pb:first}}</b><p>back in your pocket the first year</p></li>
+      <li><p class="kicker">Year 3</p><b>{{pb:paid3}}</b><p>of the system already paid off</p></li>
+      <li><p class="kicker">Year {{pb:be}}</p><b>Paid off</b><p>every month after this is yours</p></li>
+      <li><p class="kicker">Year 25</p><b>{{pb:net}}</b><p>estimated net savings</p></li>
+    </ol>
+    <div class="payback">
+      <div class="payback__sum">
+        <p class="kicker">Your position by year 25</p>
+        <p class="payback__big">{{pb:netk}}</p>
+        <p>Below the line, the system is still paying for itself ({{pb:cost}} installed). Above it, solar is putting money back every year.</p>
+        <p class="legend"><span><i class="lg lg--neg"></i>Still paying off</span><span><i class="lg lg--pos"></i>Ahead of the utility</span></p>
+      </div>
+      <div class="payback__chart">
+        <ol class="bars" style="--zero:{{pb:zero}}" aria-label="Cumulative savings by year, years 1 to 25">{{pb:bars}}</ol>
+        <div class="bars__axis"><span>Yr 1</span><span>Yr 5</span><span>Yr 10</span><span>Yr 15</span><span>Yr 20</span><span>Yr 25</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 PROCESS ============ -->
+<section class="sec sec--flush-top" aria-labelledby="proc-h" data-num="05">
+  <div class="wrap">
+    <div class="head">
+      <p class="label">05 / Our process</p>
+      <h2 class="d-l" id="proc-h">Four steps to your <em>first sunny bill.</em></h2>
+      <p class="head__note">One crew from first call to switch-on. You always know what happens next, and what (if anything) you need to do.</p>
     </div>
     <ol class="steps">
-      <li class="step"><span class="step__n">01</span><h3>Site check</h3><p class="step__k">Free · no obligation</p><p>We look at your roof, your shade and a year of bills.</p></li>
-      <li class="step"><span class="step__n">02</span><h3>Design &amp; proposal</h3><p class="step__k">Three prices</p><p>A system sized to how you actually use power, with purchase, finance and PPA numbers side by side.</p></li>
-      <li class="step"><span class="step__n">03</span><h3>Permits &amp; install</h3><p class="step__k">We do the paperwork</p><p>We handle the permits and the utility paperwork, then install on a scheduled day.</p></li>
-      <li class="step"><span class="step__n">04</span><h3>Power on</h3><p class="step__k">Watch it work</p><p>Inspection, interconnection, and a system you can watch producing from your phone.</p></li>
+      <li class="step step--forest">
+        <div class="step__body">
+          <div class="step__top"><span class="label">Step 1 of 4</span><span class="chip">Free</span></div>
+          <div class="step__prog" style="--n:1"><i></i><i></i><i></i><i></i></div>
+          <span class="step__num">01</span>
+          <h3>Site check</h3>
+          <p>We look at your roof, your shade and a year of bills, and give you a straight answer on what your roof can do, even if it's "not much."</p>
+          <p class="yourpart"><span class="label">Your part</span><b>Share a year of bills</b></p>
+        </div>
+        <img src="assets/img/roof-measure-sm.webp" alt="Installer measuring a roof during a site check" loading="lazy">
+      </li>
+      <li class="step step--navy">
+        <div class="step__body">
+          <div class="step__top"><span class="label">Step 2 of 4</span><span class="chip">Three prices</span></div>
+          <div class="step__prog" style="--n:2"><i></i><i></i><i></i><i></i></div>
+          <span class="step__num">02</span>
+          <h3>Design &amp; proposal</h3>
+          <p>A system sized to how you actually use power, with purchase, finance and PPA numbers side by side. The price we quote is the price you pay.</p>
+          <p class="yourpart"><span class="label">Your part</span><b>Pick what fits</b></p>
+        </div>
+        <img src="assets/img/consult-sm.webp" alt="Reviewing a solar proposal on paper at the kitchen table" loading="lazy">
+      </li>
+      <li class="step step--ember">
+        <div class="step__body">
+          <div class="step__top"><span class="label">Step 3 of 4</span><span class="chip">We file it</span></div>
+          <div class="step__prog" style="--n:3"><i></i><i></i><i></i><i></i></div>
+          <span class="step__num">03</span>
+          <h3>Permits &amp; install</h3>
+          <p>We file the permits and the utility paperwork, then our own crew installs on the day we scheduled. Clean work, tied off, on schedule.</p>
+          <p class="yourpart"><span class="label">Your part</span><b>Nothing {{ic:check}}</b></p>
+        </div>
+        <img src="assets/img/crew-install-sm.webp" alt="Blue Collar crew installing panels on a roof" loading="lazy">
+      </li>
+      <li class="step step--forest">
+        <div class="step__body">
+          <div class="step__top"><span class="label">Step 4 of 4</span><span class="chip">Power on</span></div>
+          <div class="step__prog" style="--n:4"><i></i><i></i><i></i><i></i></div>
+          <span class="step__num">04</span>
+          <h3>Inspection &amp; power on</h3>
+          <p>Inspection, permission to operate from the utility, and an app to watch it produce. Afterward: the same people and the same phone number.</p>
+          <p class="yourpart"><span class="label">Your part</span><b>Switch on with us</b></p>
+          <a class="more" href="process.html">See the full process {{ic:arrow}}</a>
+        </div>
+        <img src="assets/img/home-door-sm.webp" alt="Home at dusk with a finished solar installation" loading="lazy">
+      </li>
     </ol>
   </div>
 </section>
 
-<!-- ============ THE CREW ============ -->
-<section class="sec sec--paper2" aria-labelledby="who-h">
-  <div class="wrap">
-    <div class="crew">
-      <figure class="crew__photo" data-open>
-        <img src="assets/img/team-sm.webp" srcset="assets/img/team-sm.webp 900w, assets/img/team.webp 1800w" sizes="(min-width:1000px) 58vw, 100vw" alt="The Blue Collar Energy crew standing in front of the company sign" loading="lazy">
-      </figure>
-      <div class="crew__text">
-        <p class="eyebrow">Who we are</p>
-        <h2 class="d-l" id="who-h">The name is the promise.</h2>
-        <p>Blue Collar Energy is run out of Grover Beach by David Kellogg and Christian Broce. Honest work, plain numbers, and a crew you can call by name after the panels are up.</p>
-        <ul class="leads">
-          <li class="lead"><img src="assets/img/david.webp" alt="" loading="lazy"><span><b>David Kellogg</b>Chief Executive Officer</span></li>
-          <li class="lead"><img src="assets/img/christian.webp" alt="" loading="lazy"><span><b>Christian Broce</b>Chief Operations Officer</span></li>
-        </ul>
-        <a class="link-u" href="about.html">Meet the crew{{ic:arrow-r}}</a>
-      </div>
+<!-- ============ 06 WHO WE ARE ============ -->
+<section class="panel panel--forest" aria-labelledby="who-h" data-num="06">
+  <div class="who">
+    <figure class="who__photo">
+      <img src="assets/img/team-sm.webp" srcset="assets/img/team-sm.webp 900w, assets/img/team.webp 1800w" sizes="(min-width:1000px) 45vw, 100vw" alt="The Blue Collar Energy crew in front of the company sign" loading="lazy">
+      <span class="sticker">Built in<br>Grover Beach</span>
+    </figure>
+    <div class="who__text">
+      <p class="label">06 / Who we are</p>
+      <span class="who__q" aria-hidden="true">“</span>
+      <h2 class="quote" id="who-h">The name isn't a slogan. It's the standard we hold ourselves to on <em>every job.</em></h2>
+      <ul class="leads">
+        <li><img src="assets/img/david.webp" alt="" loading="lazy"><span><b>David Kellogg</b>Chief Executive Officer</span></li>
+        <li><img src="assets/img/christian.webp" alt="" loading="lazy"><span><b>Christian Broce</b>Chief Operations Officer</span></li>
+      </ul>
+      <a class="more" href="about.html">Meet the crew {{ic:arrow}}</a>
     </div>
-
-    <ul class="gallery" aria-label="Photos from our jobs">
-      <li><img src="assets/img/crew-install-sm.webp" alt="Two installers in harnesses mounting panels on a shingle roof" loading="lazy"><span>Install day, tied off and on schedule</span></li>
-      <li><img src="assets/img/roof-measure-sm.webp" alt="Installer measuring a roof with the ocean behind" loading="lazy"><span>Measured, not guessed</span></li>
-      <li><img src="assets/img/consult-sm.webp" alt="Homeowners reviewing a solar design on paper at a kitchen table" loading="lazy"><span>Three prices, on paper</span></li>
-      <li><img src="assets/img/electrical-sm.webp" alt="Electrician installing a disconnect next to the main panel" loading="lazy"><span>Clean electrical work</span></li>
-      <li><img src="assets/img/panel-close-sm.webp" alt="Close-up of black solar panels on a roof edge" loading="lazy"><span>Tidy rails, tidy roof</span></li>
-    </ul>
   </div>
 </section>
 
-<!-- ============ SERVICE AREA ============ -->
-<section class="sec" aria-labelledby="area-h">
+<!-- ============ 07 SERVICE AREA ============ -->
+<section class="sec" aria-labelledby="area-h" data-num="07">
   <div class="wrap area">
     <div class="area__text">
-      <p class="eyebrow">Service area</p>
-      <h2 class="d-l" id="area-h">Central Coast roofs, Central Coast crew.</h2>
+      <p class="label">07 / Service area</p>
+      <h2 class="d-l" id="area-h">Central Coast roofs, <em>Central Coast crew.</em></h2>
       <p>From our shop on Farroll Road we cover Grover Beach, Pismo Beach, Arroyo Grande, San Luis Obispo, Santa Maria and the rest of the Central Coast.</p>
       {{towns}}
     </div>
     {{map}}
   </div>
 </section>
+
+<div class="marquee marquee--big" aria-hidden="true"><div class="marquee__track">
+  <span>Solar</span><em>Battery backup</em><span>Three prices</span><em>Same crew</em><span>Ground mounts</span><em>Power that shows up</em>
+  <span>Solar</span><em>Battery backup</em><span>Three prices</span><em>Same crew</em><span>Ground mounts</span><em>Power that shows up</em>
+</div></div>

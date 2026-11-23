@@ -24,20 +24,13 @@ A static multi-page site. No framework and no build tooling are needed to host i
   If you change `ASSUME`, update those defaults too.
 - Shared blocks (map, town list, bill slider, CTA, footer) are partials in `src/build.py`.
 
-## 3D and motion
-- **The panel** (`assets/js/panel3d.js`): one photoreal solar panel modelled in code (bevelled aluminum
-  frame, transmissive glass, encapsulant, 120 half-cut mono cells, backsheet, junction box), lit by
-  studio softboxes with bloom. It sits in the hero; the "Seven parts. No mystery." section pins it and
-  takes it apart layer by layer as you scroll, with labels that track each layer.
-  Three.js r169 is vendored in `assets/js/vendor/` (MIT) and loaded through an import map.
-- **Motion** (`assets/js/motion.js`): GSAP 3.13 + ScrollTrigger + SplitText (free standard licence) and
-  Lenis smooth scrolling, all vendored. Headlines rise line by line just before they reach the screen;
-  body copy, numbers and buttons are never hidden. The hero intro is under a second, and a 2.5s
-  safety net in `<head>` shows it even if scripts fail.
-- **Loading**: a poster render of the panel (`assets/img/hero-panel*.webp`) shows until the first
-  WebGL frame; rendering pauses whenever the stage is off screen; phones get a lighter render path.
-  Reduced-motion users get no smooth scroll, reveals or idle drift.
-- **Regenerating the poster** after changing the scene: open `index.html#poster` over http (the hash
-  freezes the pose), wait ~3s, screenshot `.stage__sticky` at 1440x900 @1.25x and save it as
-  `hero-panel.webp` (1800w) and `hero-panel-sm.webp` (900w).
-- ES modules don't run from `file://`; preview with any static server (e.g. `python3 -m http.server`).
+## Design
+- Look: warm cream base, pastel section cards (forest, sky, ember), ink panels and gold accents.
+  Type is Inter Tight with Instrument Serif italics for accent words and Geist Mono for labels,
+  all self-hosted in `assets/fonts/`.
+- No animation libraries and no WebGL. Motion is plain CSS (two marquees, the hero badge, map routes,
+  hover states), and all of it stops for reduced-motion users. Nothing is hidden waiting for scroll.
+- The payback chart and milestones on the homepage are computed at build time by `payback()` in
+  `src/build.py`, using the same model as `assets/js/calc.js`. Keep the two in step if you change `ASSUME`.
+- Page JavaScript is small: `site.js` (header, menu, picker, sun widget, battery planner) on every page,
+  plus `calc.js` / `quote.js` where needed.

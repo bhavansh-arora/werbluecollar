@@ -97,9 +97,14 @@
         set(o + '-net', v => money(v), m[o].net);
       });
       $$('[data-v="buy-be"]', cmp).forEach(el => el.textContent = m.buy.be ? `Year ${m.buy.be}` : '—');
-      $$('[data-quote-link]', cmp).forEach(a => { a.href = `quote.html?bill=${bill}${a.dataset.pay ? '&pay=' + a.dataset.pay : ''}`; });
+      $$('[data-quote-link]', cmp).forEach(a => { a.href = `quote.html?bill=${bill}${a.dataset.pay && a.dataset.pay !== 'all' ? '&pay=' + a.dataset.pay : ''}`; });
+      // comparison bars, scaled to the best of the three
+      const top = Math.max(1, m.buy.net, m.fin.net, m.ppa.net);
+      $$('[data-bar]', cmp).forEach(el => { el.style.width = Math.max(2, m[el.dataset.bar].net / top * 100).toFixed(1) + '%'; });
+      $$('[data-bill-pick]', cmp).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.billPick === bill)));
       if (chart) drawChart(chart, m);
     };
+    $$('[data-bill-pick]', cmp).forEach(b => b.addEventListener('click', () => { range.value = b.dataset.billPick; update(); }));
     range.addEventListener('input', update);
     update();
   });

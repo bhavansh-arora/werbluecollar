@@ -1,17 +1,17 @@
 /* Blue Collar Energy — core interactions. Concept by Code Bunny.
-   Nothing here hides content: every section is visible as soon as the HTML arrives,
-   and the script only adds behaviour (menu, picker, live widgets). */
+   Small and dependency-free. Nothing here hides content; it only adds behaviour
+   (header state, menu, picker, live widgets). */
 (() => {
   const d = document;
   const $ = (s, c = d) => c.querySelector(s);
   const $$ = (s, c = d) => [...c.querySelectorAll(s)];
 
-  /* ---------- Header shadow, mobile quick bar, concept badge ---------- */
+  /* ---------- Header: transparent over the hero, solid once you scroll ---------- */
   const hdr = $('[data-hdr]'), mbar = $('.mbar'), concept = $('.concept');
   let ticking = false;
   const onScroll = () => {
     const y = scrollY;
-    if (hdr) hdr.classList.toggle('is-scrolled', y > 8);
+    if (hdr) hdr.classList.toggle('is-scrolled', y > 40);
     if (mbar) mbar.classList.toggle('on', y > 480);
     if (concept) concept.classList.toggle('on', y > innerHeight * 0.85);
     ticking = false;
@@ -31,54 +31,20 @@
   addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
   addEventListener('resize', () => { if (innerWidth >= 1100) setMenu(false); });
 
-  /* ---------- Hero "What are we powering?" picker ---------- */
+  /* ---------- Hero picker: project type -> quote link ---------- */
   $$('[data-picker]').forEach(p => {
-    const go = $('[data-picker-go]', p);
+    const go = $('[data-picker-go]', p), sel = $('[data-picker-select]', p);
+    if (sel && go) sel.addEventListener('change', () => { go.href = `quote.html?type=${sel.value}`; });
     $$('[data-type]', p).forEach(b => b.addEventListener('click', () => {
       $$('[data-type]', p).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
       if (go) go.href = `quote.html?type=${b.dataset.type}`;
     }));
   });
 
-  /* ---------- Depth: pointer tilt with glare, and a spotlight on dark sections ----------
-     Mouse/trackpad only, and off for reduced motion. Nothing here changes what is visible. */
-  const motionOK = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (motionOK && matchMedia('(pointer: fine)').matches) {
-    $$('[data-tilt]').forEach(el => {
-      const max = parseFloat(el.dataset.tilt) || 6;
-      let raf = 0;
-      el.addEventListener('pointermove', (e) => {
-        const r = el.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => {
-          el.style.setProperty('--tilt-x', ((px - 0.5) * 2 * max).toFixed(2) + 'deg');
-          el.style.setProperty('--tilt-y', ((0.5 - py) * 2 * max).toFixed(2) + 'deg');
-          el.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
-          el.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
-          el.classList.add('is-tilting');
-        });
-      });
-      el.addEventListener('pointerleave', () => {
-        cancelAnimationFrame(raf);
-        el.style.setProperty('--tilt-x', '0deg'); el.style.setProperty('--tilt-y', '0deg');
-        el.classList.remove('is-tilting');
-      });
-    });
-    $$('.sec--ink').forEach(sec => sec.addEventListener('pointermove', (e) => {
-      const r = sec.getBoundingClientRect();
-      sec.style.setProperty('--sx', (e.clientX - r.left) + 'px');
-      sec.style.setProperty('--sy', (e.clientY - r.top) + 'px');
-    }));
-  }
-
-  /* ---------- Exploded panel: point at a layer in the list to light it up ---------- */
-  $$('[data-layers]').forEach(box => {
-    const panel = $('.panel3d', box);
-    $$('[data-layer]', box).forEach(li => {
-      li.addEventListener('mouseenter', () => { panel.dataset.active = li.dataset.layer; });
-      li.addEventListener('mouseleave', () => { delete panel.dataset.active; });
-    });
+  /* ---------- Footer clock (Grover Beach time) ---------- */
+  $$('[data-clock]').forEach(el => {
+    const tick = () => { el.textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles' }) + ' PT'; };
+    tick(); setInterval(tick, 30000);
   });
 
   /* ---------- Live sun widget (Grover Beach, CA) ---------- */

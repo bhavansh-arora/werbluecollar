@@ -69,11 +69,11 @@ def sprite():
         for k, v in ICONS.items())
     return f'<svg width="0" height="0" style="position:absolute" aria-hidden="true">{syms}</svg>'
 
-IMPORTMAP = """
-<script type="importmap">{"imports": {"three": "./assets/js/vendor/three.module.min.js", "three/addons/": "./assets/js/vendor/three-addons/"}}</script>"""
+FONTS = ["inter-tight", "instrument-serif-italic", "geist-mono"]
 
 def head(meta):
     title = meta["title"]
+    preload = "".join(f'\n<link rel="preload" href="assets/fonts/{f}.woff2" as="font" type="font/woff2" crossorigin>' for f in FONTS)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -81,15 +81,13 @@ def head(meta):
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content="{meta['desc']}">
-<meta name="theme-color" content="#0e2236">
+<meta name="theme-color" content="#13202f">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{meta['desc']}">
-<meta property="og:image" content="assets/img/hero-coast.webp">
+<meta property="og:image" content="assets/img/crew-install.webp">
 <meta property="og:type" content="website">
-<link rel="icon" href="assets/img/logo-mark.png">
-<script>document.documentElement.classList.add('js');setTimeout(function(){{document.documentElement.classList.add('ready')}},2500)</script>
-<link rel="preload" href="assets/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/site.css">{IMPORTMAP if meta.get("importmap") else ""}{''.join(f'\n<link rel="modulepreload" href="assets/js/{m}">' for m in meta.get("modulepreload", []))}
+<link rel="icon" href="assets/img/logo-mark.png">{preload}
+<link rel="stylesheet" href="assets/css/site.css">
 <script type="application/ld+json">{json.dumps({
     "@context": "https://schema.org", "@type": "HomeAndConstructionBusiness",
     "name": "Blue Collar Energy", "telephone": "+1-805-441-0939", "email": EMAIL,
@@ -102,20 +100,31 @@ def ic(name, cls=""):
     c = f' class="{cls}"' if cls else ""
     return f'<svg{c} aria-hidden="true"><use href="#i-{name}"/></svg>'
 
+def btn(label, href, cls="", icon="arrow-r", attrs=""):
+    """Pill button with a round arrow chip, as on the reference."""
+    return f'<a class="btn {cls}" href="{href}"{attrs}><span>{label}</span><i class="btn__ic">{ic(icon)}</i></a>'
+
+def ticker():
+    items = ["Grover Beach, CA", "Free site check · no obligation", "Three prices on paper: buy, finance or PPA",
+             '<a href="quote.html">Book yours →</a>', "Permits &amp; utility paperwork handled", "Same crew, same phone number"]
+    row = "".join(f"<span>✦ {t}</span>" for t in items)
+    return f'<div class="topbar" aria-label="Highlights"><div class="topbar__track">{row}{row}</div></div>'
+
 def header(active):
     links = "".join(
         f'<a href="{href}"{" aria-current=\"page\"" if key == active else ""}>{label}</a>' for key, href, label in NAV)
     return f"""
 <a class="skip" href="#main">Skip to content</a>
+{ticker()}
 <header class="hdr" data-hdr>
   <div class="hdr__bar">
     <a class="brand" href="index.html" aria-label="Blue Collar Energy, home">
       <span class="brand__mark"><img src="assets/img/logo-mark.png" alt="" width="40" height="40"></span>
-      <span class="brand__word"><b>Blue Collar Energy</b><small>Solar · Grover Beach, CA</small></span>
+      <span class="brand__word">Blue Collar<small>Energy</small></span>
     </a>
     <nav class="hdr__nav" aria-label="Main">{links}</nav>
     <a class="hdr__tel" href="{TEL}">{ic('phone')}{PHONE}</a>
-    <a class="btn btn--volt btn--sm hdr__cta" href="quote.html">Free quote</a>
+    {btn('Free quote', 'quote.html', 'btn--light btn--sm hdr__cta')}
     <button class="hdr__menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu" data-menu-btn><span></span></button>
   </div>
 </header>
@@ -125,59 +134,65 @@ def header(active):
     {''.join(f'<a href="{href}"{" aria-current=\"page\"" if key == active else ""}>{label}</a>' for key, href, label in NAV)}
   </nav>
   <div class="menu__foot">
-    <a class="btn btn--volt" href="quote.html">Get my free quote{ic('arrow-r')}</a>
+    {btn('Get my free quote', 'quote.html', 'btn--gold')}
     <div><a href="{TEL}">{PHONE}</a><br><a href="mailto:{EMAIL}">{EMAIL}</a></div>
-    <div>{ADDR}</div>
   </div>
 </div>"""
 
 def cta_band(title=None, sub=None):
-    title = title or "Ready to see what your roof can do?"
-    sub = sub or "A free site check, three prices on paper, and no pressure either way. We come back with real numbers for buying, financing or a PPA."
+    title = title or 'Book a free site check. <em>No pressure.</em>'
+    sub = sub or "We look at your roof, your shade and a year of bills, then put purchase, finance and PPA numbers side by side on paper."
     return f"""
 <section class="cta" aria-labelledby="cta-h">
-  <div class="wrap cta__inner">
-    <p class="eyebrow">Free site check · No obligation</p>
-    <h2 class="d-cta" id="cta-h" data-split>{title}</h2>
-    <div class="cta__row">
-      <p>{sub}</p>
-      <div class="btns">
-        <a class="btn btn--volt btn--lg" href="quote.html" data-magnetic>Start my free quote{ic('arrow-r')}</a>
-        <a class="btn btn--ghost btn--lg" href="{TEL}">{ic('phone')}{PHONE}</a>
-      </div>
+  <img class="cta__bg" src="assets/img/hero-coast-sm.webp" srcset="assets/img/hero-coast-sm.webp 900w, assets/img/hero-coast.webp 1800w" sizes="100vw" alt="" loading="lazy">
+  <div class="cta__in">
+    <p class="kicker kicker--dot">Schedule your free site check</p>
+    <h2 class="d-xl" id="cta-h">{title}</h2>
+    <p class="cta__sub">{sub}</p>
+    <div class="btns btns--center">
+      {btn('Book my free site check', 'quote.html', 'btn--gold btn--lg')}
+      <a class="btn btn--outline-light btn--lg" href="{TEL}"><span>{PHONE}</span></a>
     </div>
+    <ul class="cta__facts">
+      <li><p class="kicker">Net billing</p><p><b>Power you use beats power you export.</b> Under California's current rules we size around a year of your real usage.</p></li>
+      <li><p class="kicker">Three prices</p><p><b>Buy, finance or PPA.</b> All three on paper, side by side, with the assumptions written down.</p></li>
+      <li><p class="kicker">One crew</p><p><b>Same people, start to finish.</b> The crew that designs it installs it and answers the phone afterward.</p></li>
+    </ul>
   </div>
 </section>"""
 
 def footer():
     return f"""
 <footer class="ftr">
-  <div class="wrap">
+  <div class="ftr__in">
     <div class="ftr__top">
       <div class="ftr__brand">
-        <a class="brand" href="index.html"><span class="brand__mark"><img src="assets/img/logo-mark.png" alt="" width="40" height="40"></span><span class="brand__word"><b>Blue Collar Energy</b><small>Solar · Batteries · Ground mounts</small></span></a>
-        <p>Solar for America, designed, permitted and installed from Grover Beach, California. Honest work, plain numbers, and a crew you can call by name after the panels are up.</p>
+        <p class="kicker kicker--dot">Grover Beach, California</p>
+        <p class="ftr__line">Solar, batteries and ground mounts, installed by a Central Coast crew.</p>
+        {btn('Get a free quote', 'quote.html', 'btn--gold btn--sm')}
       </div>
       <div>
-        <h4>Pages</h4>
-        <ul><li><a href="index.html">Home</a></li><li><a href="payment-options.html">Buy · Finance · PPA</a></li><li><a href="services.html">Services</a></li><li><a href="process.html">How it works</a></li><li><a href="about.html">About the crew</a></li><li><a href="quote.html">Free quote &amp; contact</a></li></ul>
+        <h4>Solar</h4>
+        <ul><li><a href="services.html#homes">Home solar</a></li><li><a href="services.html#business">Commercial solar</a></li><li><a href="services.html#battery">Battery storage</a></li><li><a href="services.html#ground">Ground mounts</a></li><li><a href="payment-options.html">Buy · Finance · PPA</a></li></ul>
       </div>
       <div>
-        <h4>Service area</h4>
-        <ul><li><a href="about.html#area">Grover Beach</a></li><li><a href="about.html#area">Pismo Beach</a></li><li><a href="about.html#area">Arroyo Grande</a></li><li><a href="about.html#area">San Luis Obispo</a></li><li><a href="about.html#area">Santa Maria</a></li><li><a href="about.html#area">The Central Coast</a></li></ul>
+        <h4>Company</h4>
+        <ul><li><a href="about.html">About the crew</a></li><li><a href="process.html">How it works</a></li><li><a href="about.html#area">Service area</a></li><li><a href="quote.html">Free quote</a></li></ul>
       </div>
       <div>
-        <h4>Talk to us</h4>
+        <h4>Contact</h4>
         <div class="ftr__contact">
-          <a href="{TEL}"><b>{PHONE}</b></a>
+          <a href="{TEL}">{PHONE}</a>
           <a href="mailto:{EMAIL}">{EMAIL}</a>
-          <a href="https://maps.google.com/?q=1198+Farroll+Rd+Suite+4+Grover+Beach+CA+93433" target="_blank" rel="noopener">{ADDR}</a>
+          <a href="https://maps.google.com/?q=1198+Farroll+Rd+Suite+4+Grover+Beach+CA+93433" target="_blank" rel="noopener">1198 Farroll Rd, Suite 4<br>Grover Beach, CA 93433</a>
         </div>
       </div>
     </div>
+    <p class="ftr__word" aria-hidden="true">Blue Collar</p>
     <div class="ftr__bot">
-      <span>© <span data-year>2026</span> Blue Collar Energy · Grover Beach, California</span>
-      <span>Website concept by <a href="preview-pack.html">Code Bunny</a></span>
+      <span>© <span data-year>2026</span> Blue Collar Energy. Power that shows up.</span>
+      <span>Grover Beach, CA · <span data-clock>Pacific time</span></span>
+      <span>Concept by <a href="preview-pack.html">Code Bunny</a> · <a href="#main">Back to top ↑</a></span>
     </div>
   </div>
 </footer>
@@ -188,6 +203,29 @@ def footer():
 
 def concept_badge():
     return '<a class="concept" href="preview-pack.html">Concept for Blue Collar · <b>Preview pack</b></a>'
+
+def payback(bill=220):
+    """Year-by-year position of a purchased system for the default bill, written into the page
+    so the chart is complete on first paint (same model as assets/js/calc.js)."""
+    rate, esc, deg, yld, ppw, off = 0.40, 0.035, 0.005, 1650, 3.10, 0.80
+    kwh = bill * 12 / rate
+    size = max(2.4, round(kwh / yld * 10) / 10)
+    cost = size * 1000 * ppw
+    cum, total, first = [], -cost, None
+    for t in range(1, 26):
+        avoided = size * yld * (1 - deg) ** (t - 1) * rate * (1 + esc) ** (t - 1) * off
+        first = first or avoided
+        total += avoided
+        cum.append(total)
+    be = next(i + 1 for i, v in enumerate(cum) if v >= 0)
+    lo, hi = min(cum), max(cum)
+    span = hi - lo
+    bars = "".join(
+        f'<li class="{"neg" if v < 0 else "pos"}" style="--h:{abs(v) / span * 100:.1f}%" title="Year {i + 1}: {"−" if v < 0 else ""}${abs(v):,.0f}"></li>'
+        for i, v in enumerate(cum))
+    paid3 = min(100, round((cum[2] + cost) / cost * 100))
+    return {"bars": bars, "first": f"${first:,.0f}", "paid3": f"{paid3}%", "be": be, "net": f"${cum[-1]:,.0f}",
+            "netk": f"${cum[-1] / 1000:.1f}k", "zero": f"{-lo / span * 100:.1f}%", "cost": f"${cost:,.0f}"}
 
 # Monthly-bill slider shared by the home and payment pages. Values are pre-filled for the
 # default $220 bill so the numbers are right on first paint; calc.js takes over on input.
@@ -210,7 +248,7 @@ BILL = """<div class="cmp__ctrl">
 TOWNS = ('<ul class="towns"><li class="towns__hq">' + ic("pin") + 'Grover Beach · HQ</li>' +
          "".join(f"<li>{t}</li>" for t in ["Pismo Beach", "Arroyo Grande", "San Luis Obispo", "Santa Maria", "Oceano", "Nipomo", "Avila Beach"]) + "</ul>")
 
-MAP = """<figure class="map" data-tilt="7">
+MAP = """<figure class="map">
       <svg viewBox="30 92 460 352" role="img" aria-label="Map of the Central Coast service area, centered on Grover Beach">
         <path class="map__land" d="M500 0H215c-12 40-6 70-28 104-16 26-46 36-58 66-10 24 4 52-4 80-8 30-34 44-40 74-6 30 10 60 4 92-4 26-22 52-26 94h437z"/>
         <path class="map__coast" d="M215 0c-12 40-6 70-28 104-16 26-46 36-58 66-10 24 4 52-4 80-8 30-34 44-40 74-6 30 10 60 4 92-4 26-22 52-26 94"/>
@@ -232,20 +270,22 @@ PARTIALS = {"{{towns}}": TOWNS, "{{map}}": MAP}
 
 def build():
     out = []
+    pb = payback()
     for p in sorted(PAGES.glob("*.html")):
         src = p.read_text()
         m = re.match(r"\s*<!--META (.*?)-->\s*", src, re.S)
         meta = json.loads(m.group(1))
         body = src[m.end():]
+        body = re.sub(r"\{\{btn:([^|}]+)\|([^|}]+)\|?([^}]*)\}\}", lambda mm: btn(mm.group(1), mm.group(2), mm.group(3)), body)
         body = re.sub(r"\{\{ic:([a-z-]+)(?::([a-z-_ ]+))?\}\}", lambda mm: ic(mm.group(1), mm.group(2) or ""), body)
         body = re.sub(r"<img (?![^>]*decoding=)", '<img decoding="async" ', body)  # decode off the main thread
         for k, v in PARTIALS.items():
             body = body.replace(k, v)
+        for k, v in pb.items():
+            body = body.replace("{{pb:" + k + "}}", str(v))
         body = body.replace("{{bill}}", BILL.replace("{id}", p.stem)).replace("{{PHONE}}", PHONE).replace("{{TEL}}", TEL).replace("{{EMAIL}}", EMAIL).replace("{{ADDR}}", ADDR)
         cta = cta_band(meta.get("cta_title"), meta.get("cta_sub")) if meta.get("cta", True) else ""
-        motion = ["vendor/gsap.min", "vendor/ScrollTrigger.min", "vendor/SplitText.min", "vendor/lenis.min"]
-        scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in motion + ["site", "motion"] + meta.get("scripts", []))
-        scripts += "".join(f'<script type="module" src="assets/js/{s}.js"></script>' for s in meta.get("modules", []))
+        scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site"] + meta.get("scripts", []))
         html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + header(meta.get("nav", "")) +
                 f'\n<main id="main">\n{body}\n{cta}\n</main>' + footer() +
                 (concept_badge() if meta.get("badge", True) else "") + f"\n{scripts}\n</body>\n</html>\n")
