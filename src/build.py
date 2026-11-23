@@ -124,12 +124,11 @@ def covers(page=""):
     <div class="loader__meta"><span class="kicker" data-loader-label>Charging up</span><b><span data-loader-num>0</span>%</b></div>
   </div>
 </div>
-<div class="pt" data-pt aria-hidden="true">
-  <div class="pt__in">
+<div class="pt" data-pt aria-hidden="true"></div>
+<div class="pt__in" aria-hidden="true">
     <img class="pt__mark" src="{mark}" alt="" width="48" height="48" decoding="sync">
     <div class="pt__batt"><i></i><i></i><i></i><i></i><i></i></div>
     <p class="pt__to"><span class="kicker">Heading to</span><b data-pt-name>{PAGE_NAMES.get(page, "Blue Collar")}</b></p>
-  </div>
 </div>"""
 
 def ticker():
