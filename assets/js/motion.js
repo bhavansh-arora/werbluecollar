@@ -195,12 +195,10 @@
       cur += (target - cur) * 0.2;   // the glide feel approved earlier
       if (Math.abs(target - cur) < 0.4) { cur = target; active = false; }
       go(cur); BCE.flush();
-      // a glide that runs into the top carries into a small bounce, sized by how far past it you scrolled
-      if (landing && cur <= 24) { kick(landing * 0.035); landing = 0; }
       if (active) raf = requestAnimationFrame(tick); else raf = 0;
     };
     const start = () => { if (!active) { active = true; raf = requestAnimationFrame(tick); } };
-    const stop = () => { if (active) { active = false; cancelAnimationFrame(raf); } target = cur = scrollY; landing = 0; };
+    const stop = () => { if (active) { active = false; cancelAnimationFrame(raf); } target = cur = scrollY; };
     const canScroll = (el, dy) => {
       for (; el && el !== d.body && el !== root; el = el.parentElement) {
         if (el.scrollHeight <= el.clientHeight + 1) continue;
@@ -209,28 +207,7 @@
       }
       return false;
     };
-    /* Top bounce: pushing past the top pulls the page down with growing resistance, and a spring
-       always pulls it back with a small overshoot, like a phone's rubber-band scroll. Scroll input
-       adds to the stretch but never holds it, so a trackpad's momentum tail can't leave a gap.
-       Only the page layers move (top bar, header, main, footer), via the `translate` property. */
-    const layers = $$('.topbar, .hdr, main, .ftr');
-    let pull = 0, vel = 0, sraf = 0, landing = 0;
-    const MAXPULL = 120;
-    const paint = () => { const v = Math.abs(pull) < 0.3 ? '' : `0 ${pull.toFixed(1)}px`; layers.forEach(l => { l.style.translate = v; }); };
-    const spring = () => {
-      vel = vel * 0.63 - pull * 0.105;   // ~8px overshoot, settles in ~0.4s
-      pull += vel;
-      if (Math.abs(pull) < 0.3 && Math.abs(vel) < 0.3) { pull = vel = 0; paint(); sraf = 0; return; }
-      paint(); sraf = requestAnimationFrame(spring);
-    };
-    const run = () => { if (!sraf) sraf = requestAnimationFrame(spring); };
-    const kick = (v) => { vel = clamp(v, 0, 14); run(); };
-    const stretch = (over) => {
-      const k = 1 - Math.min(0.94, Math.max(0, pull) / MAXPULL);   // resistance grows as it stretches
-      pull = Math.min(MAXPULL, pull + over * 0.4 * k);
-      vel = Math.max(vel, 0);
-      paint(); run();
-    };
+    // The page stops dead at the top and bottom: no rubber-band bounce (see also overscroll-behavior in site.css)
     addEventListener('wheel', (e) => {
       if (e.ctrlKey || e.defaultPrevented || covered() || d.body.classList.contains('menu-open')) return;
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || canScroll(e.target, e.deltaY)) return;
@@ -238,8 +215,6 @@
       if (!active) target = cur = scrollY;
       const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1);
       const want = target + dy, m = max();
-      if (want < 0 && scrollY <= 1) { stretch(-want); target = 0; return; }
-      landing = want < 0 ? Math.min(-want, 400) : 0;   // the glide will hit the top
       target = clamp(want, 0, m);
       start();
     }, { passive: false });
@@ -485,13 +460,7 @@
       setTimeout(() => {
         word.classList.add('is-live');
         let cx = [];
-        let waving = false;
-        word.addEventListener('pointerenter', () => {
-          cx = letters.map(l => { const r = l.getBoundingClientRect(); return r.left + r.width / 2; });
-          if (waving) return;                                // replay the wave of light, once per visit
-          waving = true; word.classList.toggle('wave-again');
-          setTimeout(() => { waving = false; }, 2200);
-        });
+        word.addEventListener('pointerenter', () => { cx = letters.map(l => { const r = l.getBoundingClientRect(); return r.left + r.width / 2; }); });
         word.addEventListener('pointermove', (e) => letters.forEach((l, i) => { l.style.translate = `0 ${(-Math.max(0, 1 - Math.abs(e.clientX - (cx[i] || 0)) / 240) * 12).toFixed(1)}%`; }));
         word.addEventListener('pointerleave', () => letters.forEach(l => { l.style.translate = ''; }));
       }, 1400);

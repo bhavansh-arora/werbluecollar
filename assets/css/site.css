@@ -478,7 +478,7 @@ h3 { font-weight: 650; letter-spacing: -0.025em; line-height: 1.2; }
 @media (min-width: 900px) { .cta__facts { grid-template-columns: repeat(3, 1fr); } }
 
 /* ---------- Footer ---------- */
-.ftr { margin: var(--inset) var(--inset) 0; border-radius: var(--r-xl) var(--r-xl) 0 0; background: radial-gradient(800px 400px at 50% 100%, rgba(240, 171, 60, .14), transparent 70%), var(--ink); color: var(--t-light); padding: clamp(48px, 6vw, 80px) var(--gutter) 28px; overflow: hidden; }
+.ftr { margin: var(--inset); border-radius: var(--r-xl); background: radial-gradient(800px 400px at 50% 100%, rgba(240, 171, 60, .14), transparent 70%), var(--ink); color: var(--t-light); padding: clamp(48px, 6vw, 80px) var(--gutter) 28px; overflow: hidden; }
 .ftr__in { max-width: var(--maxw); margin-inline: auto; }
 .ftr__top { display: grid; gap: 36px 24px; grid-template-columns: 1fr 1fr; }
 .ftr__brand { grid-column: 1 / -1; display: grid; gap: 18px; justify-items: start; }
@@ -501,7 +501,7 @@ h3 { font-weight: 650; letter-spacing: -0.025em; line-height: 1.2; }
 .mbar a.q { background: var(--gold); color: var(--ink); }
 .mbar svg { width: 17px; height: 17px; }
 @media (min-width: 900px) { .mbar { display: none; } }
-@media (max-width: 899px) { .ftr { padding-bottom: 96px; } }   /* room for the quick-action bar, inside the footer */
+@media (max-width: 899px) { .ftr { margin-bottom: 76px; } }
 .concept { position: fixed; right: 16px; bottom: 16px; z-index: 55; display: none; gap: 6px; padding: 9px 16px; border-radius: 999px; background: var(--white); color: var(--ink); font-size: 13px; box-shadow: 0 16px 36px -16px rgba(19, 32, 47, .45); opacity: 0; pointer-events: none; transition: opacity .3s; }
 .concept b { color: var(--accent); }
 .concept.on { opacity: 1; pointer-events: auto; }
@@ -1331,20 +1331,12 @@ html.is-loading .hero__bg.plx, html.pt-in .hero__bg.plx { scale: 1.2; }
 .marquee--big { will-change: transform; }
 .marquee--big span:nth-of-type(even) { color: transparent; -webkit-text-stroke: 1.6px var(--ink); }
 
-/* Footer wordmark: a wave of light rolls across the letters */
-.ftr__word.is-split span { background-image: linear-gradient(105deg, rgba(255, 250, 235, 0) 40%, rgba(255, 250, 235, .9) 50%, rgba(255, 250, 235, 0) 60%), linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 55%, var(--gold-dim) 100%);
-  background-size: 320% 100%, 100% 100%; background-position: 160% 0, 0 0; background-repeat: no-repeat; }
-/* plays once as the letters land, and again whenever the pointer passes over the word */
-.ftr__word.is-in span { animation: wave 1.6s ease-in-out both; animation-delay: calc(1.3s + var(--ld) * 1.4); }
-.ftr__word.is-in.wave-again span { animation-name: wave2; animation-delay: calc(var(--ld) * 1.4); }
-@keyframes wave { from { background-position: 160% 0, 0 0; } to { background-position: -60% 0, 0 0; } }
-@keyframes wave2 { from { background-position: 160% 0, 0 0; } to { background-position: -60% 0, 0 0; } }
-.ftr { position: relative; }
-.ftr::before { content: ""; position: absolute; left: 50%; bottom: -30%; width: 90%; aspect-ratio: 2.4; margin-left: -45%; border-radius: 50%; pointer-events: none; background: radial-gradient(closest-side, rgba(240, 171, 60, .22), transparent 70%); }
-
 @media (prefers-reduced-motion: reduce) {
   .aurora i, .sunrays, .hero em, .cta em, .ftr__word span { animation: none !important; }
   .cur, .progress { display: none; }
 }
 /* Slow devices (detected by motion.js): decorative loops hold still */
 html.lite .aurora i, html.lite .sunrays, html.lite .hero em, html.lite .cta em { animation: none !important; }
+
+/* No rubber-band bounce at the top or bottom of the page on desktop trackpads */
+@media (pointer: fine) { html, body { overscroll-behavior-y: none; } }
