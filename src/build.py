@@ -86,7 +86,8 @@ def head(meta):
 <meta property="og:description" content="{meta['desc']}">
 <meta property="og:image" content="assets/img/crew-install.webp">
 <meta property="og:type" content="website">
-<link rel="icon" href="assets/img/logo-mark.png">{preload}
+<link rel="icon" href="assets/img/logo-mark.png">
+<script>(function(){{var d=document.documentElement;d.classList.add('js');try{{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add(sessionStorage.getItem('bce-boot')?'pt-in':'is-loading');}}catch(e){{}}setTimeout(function(){{d.classList.remove('is-loading','pt-in')}},3600);}})();</script>{preload}
 <link rel="stylesheet" href="assets/css/site.css">
 <script type="application/ld+json">{json.dumps({
     "@context": "https://schema.org", "@type": "HomeAndConstructionBusiness",
@@ -103,6 +104,26 @@ def ic(name, cls=""):
 def btn(label, href, cls="", icon="arrow-r", attrs=""):
     """Pill button with a round arrow chip, as on the reference."""
     return f'<a class="btn {cls}" href="{href}"{attrs}><span>{label}</span><i class="btn__ic">{ic(icon)}</i></a>'
+
+def covers():
+    """First-visit loader (a battery charging with real page progress) and the page-change curtain."""
+    cells = "<i></i>" * 10
+    return f"""
+<div class="loader" data-loader aria-hidden="true">
+  <div class="loader__glow"></div>
+  <div class="loader__in">
+    <img class="loader__logo" src="assets/img/logo-mark.png" alt="" width="84" height="84">
+    <div class="loader__batt"><div class="loader__cells">{cells}</div></div>
+    <div class="loader__meta"><span class="kicker" data-loader-label>Charging up</span><b><span data-loader-num>0</span>%</b></div>
+  </div>
+</div>
+<div class="pt" data-pt aria-hidden="true">
+  <div class="pt__in">
+    <img class="pt__mark" src="assets/img/logo-mark.png" alt="" width="48" height="48">
+    <div class="pt__batt"><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="pt__to"><span class="kicker">Heading to</span><b data-pt-name>Blue Collar</b></p>
+  </div>
+</div>"""
 
 def ticker():
     items = ["Grover Beach, CA", "Free site check · no obligation", "Three prices on paper: buy, finance or PPA",
@@ -285,8 +306,8 @@ def build():
             body = body.replace("{{pb:" + k + "}}", str(v))
         body = body.replace("{{bill}}", BILL.replace("{id}", p.stem)).replace("{{PHONE}}", PHONE).replace("{{TEL}}", TEL).replace("{{EMAIL}}", EMAIL).replace("{{ADDR}}", ADDR)
         cta = cta_band(meta.get("cta_title"), meta.get("cta_sub")) if meta.get("cta", True) else ""
-        scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site"] + meta.get("scripts", []))
-        html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + header(meta.get("nav", "")) +
+        scripts = "".join(f'<script src="assets/js/{s}.js" defer></script>' for s in ["site", "motion"] + meta.get("scripts", []))
+        html = (head(meta) + f'\n<body class="{meta.get("body", "")}">\n' + sprite() + covers() + header(meta.get("nav", "")) +
                 f'\n<main id="main">\n{body}\n{cta}\n</main>' + footer() +
                 (concept_badge() if meta.get("badge", True) else "") + f"\n{scripts}\n</body>\n</html>\n")
         (ROOT / p.name).write_text(html)

@@ -28,8 +28,19 @@ A static multi-page site. No framework and no build tooling are needed to host i
 - Look: warm cream base, pastel section cards (forest, sky, ember), ink panels and gold accents.
   Type is Inter Tight with Instrument Serif italics for accent words and Geist Mono for labels,
   all self-hosted in `assets/fonts/`.
-- No animation libraries and no WebGL. Motion is plain CSS (two marquees, the hero badge, map routes,
-  hover states), and all of it stops for reduced-motion users. Nothing is hidden waiting for scroll.
+- No animation libraries and no WebGL. Motion lives in `assets/js/motion.js` (plain JS) and the motion
+  block of `site.css`:
+  - First visit in a session: a loader whose battery charges with real page progress (1.4s to 3s),
+    then lifts on a curved edge. Later page changes: a curtain sweeps up with the next page's name and
+    lifts on arrival (about 0.4s). Both have hard time limits.
+  - Headlines rise word by word, cards and lists stagger in, numbers count up, payback bars grow,
+    the "why" statement lights up as you scroll, photos drift (parallax), process cards stack,
+    the big word band speeds up with scrolling, a spotlight follows the cursor on cards, primary buttons
+    are magnetic, and the footer wordmark letters rise and lift near the cursor.
+  - Rule: content that is already on screen is never hidden; entrances only apply below the fold or
+    behind a cover. Reduced-motion users get none of it.
+- "A day on a Blue Collar home" (`assets/js/day.js`): an SVG house from 5:30 AM to midnight, simulated in
+  5-minute steps for the same 4.0 kW system plus a 13.5 kWh battery, with play, scrub and an outage switch.
 - The payback chart and milestones on the homepage are computed at build time by `payback()` in
   `src/build.py`, using the same model as `assets/js/calc.js`. Keep the two in step if you change `ASSUME`.
 - Page JavaScript is small: `site.js` (header, menu, picker, sun widget, battery planner) on every page,

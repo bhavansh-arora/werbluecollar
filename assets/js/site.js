@@ -47,28 +47,39 @@
     tick(); setInterval(tick, 30000);
   });
 
-  /* ---------- Live sun widget (Grover Beach, CA) ---------- */
+  /* ---------- Sunrise / sunset for Grover Beach, CA ---------- */
+  const LAT = 35.1208, LNG = -120.6213, TZ = 'America/Los_Angeles';
+  const rad = Math.PI / 180, dayMs = 864e5, J1970 = 2440588, J2000 = 2451545, e = rad * 23.4397, J0 = 0.0009;
+  const toDays = (dt) => dt.valueOf() / dayMs - 0.5 + J1970 - J2000;
+  const fromJ = (j) => new Date((j + 0.5 - J1970) * dayMs);
+  const hm = (dt) => dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: TZ });
+  const times = (date) => {
+    const lw = rad * -LNG, phi = rad * LAT, dd = toDays(date);
+    const n = Math.round(dd - J0 - lw / (2 * Math.PI));
+    const ds = J0 + lw / (2 * Math.PI) + n;
+    const M = rad * (357.5291 + 0.98560028 * ds);
+    const C = rad * (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M));
+    const L = M + C + rad * 102.9372 + Math.PI;
+    const dec = Math.asin(Math.sin(e) * Math.sin(L));
+    const Jnoon = J2000 + ds + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
+    const w = Math.acos((Math.sin(-0.833 * rad) - Math.sin(phi) * Math.sin(dec)) / (Math.cos(phi) * Math.cos(dec)));
+    const a = J0 + (w + lw) / (2 * Math.PI) + n;
+    const Jset = J2000 + a + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
+    return { rise: fromJ(Jnoon - (Jset - Jnoon)), set: fromJ(Jset), noon: fromJ(Jnoon) };
+  };
+
+  /* ---------- Home facts card: live local time and today's sun ---------- */
+  const sunline = $('[data-sunline]');
+  if (sunline) {
+    const t = times(new Date()), now = new Date();
+    sunline.textContent = now < t.rise ? `Sunrise at ${hm(t.rise)}` : now < t.set ? `Sun's up until ${hm(t.set)}` : `Sunrise at ${hm(times(new Date(+now + dayMs)).rise)}`;
+  }
+  $$('[data-clock-short]').forEach(el => { const tick = () => { el.textContent = hm(new Date()); }; tick(); setInterval(tick, 30000); });
+
+  /* ---------- Live sun widget (services page) ---------- */
   const sunEl = $('[data-sun]');
-  if (sunEl) {
-    const LAT = 35.1208, LNG = -120.6213, TZ = 'America/Los_Angeles';
-    const rad = Math.PI / 180, dayMs = 864e5, J1970 = 2440588, J2000 = 2451545, e = rad * 23.4397, J0 = 0.0009;
-    const toDays = (dt) => dt.valueOf() / dayMs - 0.5 + J1970 - J2000;
-    const fromJ = (j) => new Date((j + 0.5 - J1970) * dayMs);
-    const times = (date) => {
-      const lw = rad * -LNG, phi = rad * LAT, dd = toDays(date);
-      const n = Math.round(dd - J0 - lw / (2 * Math.PI));
-      const ds = J0 + lw / (2 * Math.PI) + n;
-      const M = rad * (357.5291 + 0.98560028 * ds);
-      const C = rad * (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M));
-      const L = M + C + rad * 102.9372 + Math.PI;
-      const dec = Math.asin(Math.sin(e) * Math.sin(L));
-      const Jnoon = J2000 + ds + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
-      const w = Math.acos((Math.sin(-0.833 * rad) - Math.sin(phi) * Math.sin(dec)) / (Math.cos(phi) * Math.cos(dec)));
-      const a = J0 + (w + lw) / (2 * Math.PI) + n;
-      const Jset = J2000 + a + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
-      return { rise: fromJ(Jnoon - (Jset - Jnoon)), set: fromJ(Jset), noon: fromJ(Jnoon) };
-    };
-    const fmt = (dt) => dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: TZ });
+  if (sunEl && !sunEl.closest('[data-day]')) {
+    const fmt = hm;
     const draw = () => {
       const now = new Date(), t = times(now);
       const len = (t.set - t.rise) / 36e5;
