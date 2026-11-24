@@ -87,7 +87,7 @@ def head(meta):
 <meta property="og:image" content="assets/img/crew-install.webp">
 <meta property="og:type" content="website">
 <link rel="icon" href="assets/img/logo-mark.png">
-<script>(function(){{var d=document.documentElement;d.classList.add('js');try{{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var t=+localStorage.getItem('bce-boot')||0;d.classList.add(sessionStorage.getItem('bce-boot')||Date.now()-t<864e5?'pt-in':'is-loading');}}catch(e){{}}setTimeout(function(){{if(!window.BCE_READY)d.classList.remove('is-loading','pt-in')}},8000);}})();</script>{preload}
+<script>(function(){{var d=document.documentElement;d.classList.add('js');try{{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var r=document.referrer,inside=false;try{{inside=!!r&&new URL(r).origin===location.origin}}catch(e){{}}d.classList.add(inside?'pt-in':'is-loading');}}catch(e){{}}setTimeout(function(){{if(!window.BCE_READY)d.classList.remove('is-loading','pt-in')}},8000);}})();</script>{preload}
 <link rel="stylesheet" href="assets/css/site.css">
 <script type="application/ld+json">{json.dumps({
     "@context": "https://schema.org", "@type": "HomeAndConstructionBusiness",
@@ -114,7 +114,9 @@ def covers(page=""):
     cells = "<i></i>" * 10
     # The loader runs from an inline script, so it starts charging the moment the HTML arrives instead of
     # waiting for motion.js. It charges with real progress (DOM, fonts, above-the-fold images, motion.js
-    # ready) and only lifts once the page is ready, so it never cuts off part way. Hard limit: 7s.
+    # ready) for at least 1.6s once it is on screen, and only lifts once the page is ready, so it never cuts
+    # off part way. Hard limit: 8s after navigation. It plays whenever the visitor arrives from outside the site
+    # (typed address, bookmark, another site); moves within the site get the page curtain instead (see head()).
     # Both logos are drawn from a data URI in site.css (.loader__logo, .pt__mark), so they are there in the first frame.
     return f"""
 <div class="loader" data-loader aria-hidden="true">
@@ -126,7 +128,7 @@ def covers(page=""):
   </div>
 </div>
 <script>(function(){{var d=document,r=d.documentElement,L=d.querySelector('[data-loader]');if(!L||!r.classList.contains('is-loading'))return;
-var C=L.querySelectorAll('.loader__cells i'),num=L.querySelector('[data-loader-num]'),lab=L.querySelector('[data-loader-label]'),N=C.length,lit=0,last=0,done=0,fonts=0,dom=0,loaded=0,imgs=[],MIN=1400,MAX=7000;
+var C=L.querySelectorAll('.loader__cells i'),num=L.querySelector('[data-loader-num]'),lab=L.querySelector('[data-loader-label]'),N=C.length,lit=0,last=0,done=0,fonts=0,dom=0,loaded=0,imgs=[],t0=0,MIN=1600,MAX=8000;
 if(d.fonts)d.fonts.ready.then(function(){{fonts=1}});
 d.addEventListener('DOMContentLoaded',function(){{dom=1;imgs=[].filter.call(d.images,function(i){{return i.loading!=='lazy'&&!L.contains(i)}})}});
 addEventListener('load',function(){{loaded=1}});
@@ -134,9 +136,8 @@ function pics(){{if(loaded)return 1;if(!imgs.length)return 0;var n=0;for(var i=0
 function ready(){{return dom&&fonts&&window.BCE_READY&&pics()===1}}
 function frac(){{return ready()?1:dom*.2+fonts*.15+pics()*.4+(window.BCE_READY?.15:0)}}
 function finish(){{if(done)return;done=1;for(var i=0;i<N;i++)C[i].classList.add('on');num.textContent='100';lab.textContent='Fully charged';L.classList.add('is-charged');
-try{{sessionStorage.setItem('bce-boot','1');localStorage.setItem('bce-boot',String(Date.now()))}}catch(e){{}}
 setTimeout(function(){{L.classList.add('is-done');setTimeout(function(){{r.classList.remove('is-loading');d.dispatchEvent(new Event('bce:uncover'))}},320);setTimeout(function(){{L.remove()}},1500)}},380)}}
-function tick(now){{if(done)return;var want=Math.min(N,Math.ceil(Math.min(now/MIN,.1+.9*frac())*N));
+function tick(now){{if(done)return;if(!t0)t0=now;var want=Math.min(N,Math.ceil(Math.min((now-t0)/MIN,.1+.9*frac())*N));
 if(want>lit&&now-last>110){{C[lit].classList.add('on');lit++;last=now;num.textContent=Math.round(lit/N*100);L.style.setProperty('--p',lit/N)}}
 if((lit>=N&&ready())||now>=MAX)return finish();requestAnimationFrame(tick)}}
 requestAnimationFrame(tick)}})();</script>
