@@ -24,37 +24,12 @@
     'process.html': 'How it works', 'about.html': 'About the crew', 'quote.html': 'Your free quote' };
   const nameFor = (url) => NAMES[url.pathname.split('/').pop()] || 'Blue Collar';
 
-  // First visit: the battery charges with real page progress (images + fonts), 1.4s to 3s.
+  // First visit: the battery loader runs from an inline script in the page (see covers() in build.py),
+  // so it starts the moment the HTML arrives. It waits for BCE_READY (set at the end of this file) and
+  // then fires 'bce:uncover'.
+  d.addEventListener('bce:uncover', uncover);
   const loader = $('[data-loader]');
-  if (loader && root.classList.contains('is-loading')) {
-    const cells = $$('.loader__cells i', loader), num = $('[data-loader-num]', loader), lab = $('[data-loader-label]', loader);
-    const N = cells.length, t0 = performance.now(), MIN = 1400, MAX = 3000;
-    const imgs = [...d.images].filter(i => i.loading !== 'lazy' && !loader.contains(i));
-    let fonts = false, loaded = false, lit = 0, last = 0, done = false;
-    d.fonts && d.fonts.ready.then(() => { fonts = true; });
-    addEventListener('load', () => { loaded = true; });
-    const frac = () => loaded ? 1 : (imgs.filter(i => i.complete).length + (fonts ? 1 : 0)) / (imgs.length + 1);
-    const finish = () => {
-      if (done) return; done = true;
-      cells.forEach(c => c.classList.add('on')); num.textContent = '100'; lab.textContent = 'Fully charged';
-      loader.classList.add('is-charged');
-      // remembered across tabs for a day, so a page opened in a new tab or window doesn't replay the loader
-      try { sessionStorage.setItem('bce-boot', '1'); localStorage.setItem('bce-boot', String(Date.now())); } catch (e) {}
-      setTimeout(() => {
-        loader.classList.add('is-done');
-        setTimeout(uncover, 320);
-        setTimeout(() => loader.remove(), 1500);
-      }, 380);
-    };
-    const tick = (now) => {
-      if (done) return;
-      const t = now - t0, want = Math.min(N, Math.ceil(Math.min(t / MIN, 0.15 + 0.85 * frac()) * N));
-      if (want > lit && now - last > 110) { cells[lit].classList.add('on'); lit++; last = now; num.textContent = Math.round(lit / N * 100); loader.style.setProperty('--p', lit / N); }
-      if ((lit >= N && t >= MIN) || t >= MAX) return finish();
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  } else if (loader) loader.remove();
+  if (loader && !root.classList.contains('is-loading')) loader.remove();
 
   // Arriving from another page (or a reload): the curtain is down, lift it as soon as the page is usable.
   const pt = $('[data-pt]'), ptName = $('[data-pt-name]');
@@ -466,4 +441,5 @@
       }, 1400);
     }, '0px 0px -10% 0px');
   }
+  window.BCE_READY = true;   // the loader and the head failsafe wait for this
 })();

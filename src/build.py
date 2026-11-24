@@ -5,7 +5,6 @@ Each page starts with a JSON meta comment:
 <!--META {"title": "...", "desc": "...", "nav": "payment", "scripts": ["calc"], "cta": true} -->
 Run:  python3 src/build.py
 """
-import base64
 import json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -88,7 +87,7 @@ def head(meta):
 <meta property="og:image" content="assets/img/crew-install.webp">
 <meta property="og:type" content="website">
 <link rel="icon" href="assets/img/logo-mark.png">
-<script>(function(){{var d=document.documentElement;d.classList.add('js');try{{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var t=+localStorage.getItem('bce-boot')||0;d.classList.add(sessionStorage.getItem('bce-boot')||Date.now()-t<864e5?'pt-in':'is-loading');}}catch(e){{}}setTimeout(function(){{d.classList.remove('is-loading','pt-in')}},3600);}})();</script>{preload}
+<script>(function(){{var d=document.documentElement;d.classList.add('js');try{{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var t=+localStorage.getItem('bce-boot')||0;d.classList.add(sessionStorage.getItem('bce-boot')||Date.now()-t<864e5?'pt-in':'is-loading');}}catch(e){{}}setTimeout(function(){{if(!window.BCE_READY)d.classList.remove('is-loading','pt-in')}},8000);}})();</script>{preload}
 <link rel="stylesheet" href="assets/css/site.css">
 <script type="application/ld+json">{json.dumps({
     "@context": "https://schema.org", "@type": "HomeAndConstructionBusiness",
@@ -113,20 +112,37 @@ PAGE_NAMES = {"index": "Home", "payment-options": "Ways to pay", "services": "Se
 def covers(page=""):
     """First-visit loader (a battery charging with real page progress) and the page-change curtain."""
     cells = "<i></i>" * 10
-    # the curtain's logo is inlined (6 KB) so it is on screen in the very first frame of the next page
-    mark = "data:image/webp;base64," + base64.b64encode((ROOT / "assets/img/logo-mark-96.webp").read_bytes()).decode()
+    # The loader runs from an inline script, so it starts charging the moment the HTML arrives instead of
+    # waiting for motion.js. It charges with real progress (DOM, fonts, above-the-fold images, motion.js
+    # ready) and only lifts once the page is ready, so it never cuts off part way. Hard limit: 7s.
+    # Both logos are drawn from a data URI in site.css (.loader__logo, .pt__mark), so they are there in the first frame.
     return f"""
 <div class="loader" data-loader aria-hidden="true">
   <div class="loader__glow"></div>
   <div class="loader__in">
-    <img class="loader__logo" src="assets/img/logo-mark.png" alt="" width="84" height="84">
+    <span class="loader__logo"></span>
     <div class="loader__batt"><div class="loader__cells">{cells}</div></div>
     <div class="loader__meta"><span class="kicker" data-loader-label>Charging up</span><b><span data-loader-num>0</span>%</b></div>
   </div>
 </div>
+<script>(function(){{var d=document,r=d.documentElement,L=d.querySelector('[data-loader]');if(!L||!r.classList.contains('is-loading'))return;
+var C=L.querySelectorAll('.loader__cells i'),num=L.querySelector('[data-loader-num]'),lab=L.querySelector('[data-loader-label]'),N=C.length,lit=0,last=0,done=0,fonts=0,dom=0,loaded=0,imgs=[],MIN=1400,MAX=7000;
+if(d.fonts)d.fonts.ready.then(function(){{fonts=1}});
+d.addEventListener('DOMContentLoaded',function(){{dom=1;imgs=[].filter.call(d.images,function(i){{return i.loading!=='lazy'&&!L.contains(i)}})}});
+addEventListener('load',function(){{loaded=1}});
+function pics(){{if(loaded)return 1;if(!imgs.length)return 0;var n=0;for(var i=0;i<imgs.length;i++)if(imgs[i].complete)n++;return n/imgs.length}}
+function ready(){{return dom&&fonts&&window.BCE_READY&&pics()===1}}
+function frac(){{return ready()?1:dom*.2+fonts*.15+pics()*.4+(window.BCE_READY?.15:0)}}
+function finish(){{if(done)return;done=1;for(var i=0;i<N;i++)C[i].classList.add('on');num.textContent='100';lab.textContent='Fully charged';L.classList.add('is-charged');
+try{{sessionStorage.setItem('bce-boot','1');localStorage.setItem('bce-boot',String(Date.now()))}}catch(e){{}}
+setTimeout(function(){{L.classList.add('is-done');setTimeout(function(){{r.classList.remove('is-loading');d.dispatchEvent(new Event('bce:uncover'))}},320);setTimeout(function(){{L.remove()}},1500)}},380)}}
+function tick(now){{if(done)return;var want=Math.min(N,Math.ceil(Math.min(now/MIN,.1+.9*frac())*N));
+if(want>lit&&now-last>110){{C[lit].classList.add('on');lit++;last=now;num.textContent=Math.round(lit/N*100);L.style.setProperty('--p',lit/N)}}
+if((lit>=N&&ready())||now>=MAX)return finish();requestAnimationFrame(tick)}}
+requestAnimationFrame(tick)}})();</script>
 <div class="pt" data-pt aria-hidden="true"></div>
 <div class="pt__in" aria-hidden="true">
-    <img class="pt__mark" src="{mark}" alt="" width="48" height="48" decoding="sync">
+    <span class="pt__mark"></span>
     <div class="pt__batt"><i></i><i></i><i></i><i></i><i></i></div>
     <p class="pt__to"><span class="kicker">Heading to</span><b data-pt-name>{PAGE_NAMES.get(page, "Blue Collar")}</b></p>
 </div>"""

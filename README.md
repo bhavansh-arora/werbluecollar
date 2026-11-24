@@ -29,7 +29,7 @@ A static multi-page site. No framework and no build tooling are needed to host i
   all self-hosted in `assets/fonts/`.
 - No animation libraries and no WebGL. Motion lives in `assets/js/motion.js` (plain JS) and the motion
   block of `site.css`:
-  - First visit in a session: a loader whose battery charges with real page progress (1.4s to 3s),
+  - First visit of the day: a loader whose battery charges with real page progress (at least 1.4s, at most 7s; it runs from an inline script so it starts before motion.js and lifts only once the page is ready),
     then lifts on a curved edge. Later page changes: a curtain sweeps up with the next page's name and
     lifts on arrival (about 0.4s). Both have hard time limits.
   - Headlines rise word by word, cards and lists stagger in, numbers count up, payback bars grow,
